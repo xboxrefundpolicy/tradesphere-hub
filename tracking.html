@@ -1,0 +1,1247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>Order Tracking – Tradesphere Hub</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        :root {
+            --bg-primary: #0A0A0A;
+            --bg-card: #141414;
+            --bg-input: #1E1E1E;
+            --border-color: #2A2A2A;
+            --text-primary: #FFFFFF;
+            --text-secondary: #A0A0A0;
+            --accent-gold: #F59E0B;
+            --accent-gold-hover: #D97706;
+            --radius: 16px;
+            --shadow: 0 8px 32px rgba(0,0,0,0.5);
+            --success: #10B981;
+            --danger: #EF4444;
+            --warning: #F59E0B;
+            --info: #3B82F6;
+        }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .container { max-width: 960px; width: 100%; }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0 16px;
+            border-bottom: 1px solid var(--border-color);
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .logo { display: flex; align-items: center; gap: 10px; cursor: pointer; }
+        .logo-icon {
+            background: linear-gradient(135deg, var(--accent-gold), #FBBF24);
+            color: #000;
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            font-weight: 800;
+        }
+        .logo-text {
+            font-size: 20px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+        }
+        .logo-text span { color: var(--accent-gold); }
+        .nav {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .nav a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 500;
+            padding: 6px 12px;
+            border-radius: 8px;
+            transition: 0.3s ease;
+        }
+        .nav a:hover {
+            color: var(--text-primary);
+            background: rgba(255,255,255,0.05);
+        }
+        .nav a.active {
+            color: var(--accent-gold);
+            background: rgba(245,158,11,0.1);
+        }
+
+        .hero {
+            text-align: center;
+            padding: 20px 0 8px;
+        }
+        .hero h1 {
+            font-size: 28px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #fff 40%, var(--accent-gold));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -1px;
+        }
+        .hero p {
+            color: var(--text-secondary);
+            font-size: 14px;
+            max-width: 480px;
+            margin: 6px auto 0;
+        }
+
+        /* ----- AUTH SCREENS ----- */
+        .auth-box {
+            max-width: 400px;
+            margin: 30px auto;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            padding: 32px 28px;
+            box-shadow: var(--shadow);
+            text-align: center;
+        }
+        .auth-box .icon { font-size: 48px; margin-bottom: 8px; }
+        .auth-box h2 {
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+        .auth-box .sub {
+            color: var(--text-secondary);
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+        .auth-box input {
+            width: 100%;
+            padding: 14px 16px;
+            background: var(--bg-input);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            color: var(--text-primary);
+            font-size: 15px;
+            margin-bottom: 14px;
+            transition: border 0.3s ease;
+        }
+        .auth-box input:focus {
+            outline: none;
+            border-color: var(--accent-gold);
+        }
+        .auth-box .auth-btn {
+            width: 100%;
+            padding: 14px;
+            background: var(--accent-gold);
+            color: #000;
+            border: none;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 16px;
+            cursor: pointer;
+            transition: 0.3s ease;
+        }
+        .auth-box .auth-btn:hover {
+            background: var(--accent-gold-hover);
+            transform: scale(1.01);
+        }
+        .auth-box .error {
+            color: var(--danger);
+            font-size: 13px;
+            margin-top: 10px;
+            display: none;
+        }
+
+        /* ----- STATS ----- */
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 12px;
+            margin: 20px 0 24px;
+        }
+        .stat-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+            transition: border 0.3s ease;
+        }
+        .stat-card:hover { border-color: var(--accent-gold); }
+        .stat-card .number {
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--accent-gold);
+        }
+        .stat-card .label {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: 2px;
+        }
+
+        /* ----- TOOLBAR ----- */
+        .toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+        .add-btn {
+            background: var(--accent-gold);
+            color: #000;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 40px;
+            font-weight: 700;
+            font-size: 14px;
+            cursor: pointer;
+            transition: 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .add-btn:hover {
+            background: var(--accent-gold-hover);
+            transform: scale(1.02);
+        }
+
+        /* ----- ORDER CARDS (Admin & Client) ----- */
+        .order-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            padding: 18px;
+            margin-bottom: 14px;
+            transition: all 0.3s ease;
+        }
+        .order-card:hover {
+            border-color: var(--accent-gold);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+        }
+        .order-card .top-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 4px;
+        }
+        .order-card .order-title {
+            font-weight: 700;
+            font-size: 16px;
+        }
+        .order-card .order-date {
+            color: var(--text-secondary);
+            font-size: 13px;
+        }
+        .order-card .order-details {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+        .order-card .order-details .client-email {
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        .order-card .status-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            display: inline-block;
+            margin-bottom: 8px;
+        }
+        .status-pending {
+            background: rgba(245,158,11,0.15);
+            color: var(--warning);
+        }
+        .status-processing {
+            background: rgba(59,130,246,0.15);
+            color: var(--info);
+        }
+        .status-progress {
+            background: rgba(139,92,246,0.15);
+            color: #8B5CF6;
+        }
+        .status-completed {
+            background: rgba(16,185,129,0.15);
+            color: var(--success);
+        }
+        .status-expired {
+            background: rgba(239,68,68,0.1);
+            color: var(--danger);
+        }
+
+        /* Admin status control */
+        .status-control {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 6px;
+        }
+        .status-control select {
+            padding: 6px 12px;
+            background: var(--bg-input);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+        }
+        .status-control select:focus {
+            outline: none;
+            border-color: var(--accent-gold);
+        }
+        .status-control .update-btn {
+            padding: 6px 16px;
+            background: var(--accent-gold);
+            color: #000;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 12px;
+            cursor: pointer;
+            transition: 0.3s ease;
+        }
+        .status-control .update-btn:hover {
+            background: var(--accent-gold-hover);
+        }
+
+        .order-card .actions {
+            display: flex;
+            gap: 6px;
+            margin-top: 10px;
+            flex-wrap: wrap;
+        }
+        .order-card .actions button {
+            padding: 5px 12px;
+            border-radius: 6px;
+            border: none;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s ease;
+        }
+        .order-card .delete-btn {
+            background: rgba(239,68,68,0.08);
+            color: var(--danger);
+        }
+        .order-card .delete-btn:hover {
+            background: rgba(239,68,68,0.2);
+        }
+
+        /* Client status message & timeline */
+        .order-card .status-message {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin: 6px 0 10px;
+            padding: 8px 12px;
+            background: var(--bg-input);
+            border-radius: 8px;
+            border-left: 3px solid var(--accent-gold);
+        }
+        .order-card .status-message .whatsapp {
+            color: #25D366;
+            font-weight: 600;
+        }
+
+        .progress-timeline {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin: 10px 0 12px;
+            padding: 8px 0;
+            position: relative;
+        }
+        .progress-timeline::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 10%;
+            right: 10%;
+            height: 2px;
+            background: var(--border-color);
+            transform: translateY(-50%);
+            z-index: 0;
+        }
+        .progress-step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            z-index: 1;
+            gap: 4px;
+            flex: 1;
+        }
+        .progress-step .dot {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            border: 2px solid var(--border-color);
+            background: var(--bg-card);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            transition: all 0.3s ease;
+        }
+        .progress-step .dot.active {
+            border-color: var(--accent-gold);
+            background: var(--accent-gold);
+            color: #000;
+        }
+        .progress-step .dot.completed {
+            border-color: var(--success);
+            background: var(--success);
+            color: #000;
+        }
+        .progress-step .label {
+            font-size: 9px;
+            color: var(--text-secondary);
+            text-align: center;
+            max-width: 50px;
+        }
+        .progress-step .label.active {
+            color: var(--accent-gold);
+            font-weight: 600;
+        }
+        .progress-step .label.completed {
+            color: var(--success);
+            font-weight: 600;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-secondary);
+        }
+        .empty-state .icon {
+            font-size: 48px;
+            margin-bottom: 12px;
+        }
+        .empty-state h3 {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .footer {
+            margin-top: 32px;
+            padding-top: 16px;
+            border-top: 1px solid var(--border-color);
+            text-align: center;
+            font-size: 11px;
+            color: var(--text-secondary);
+        }
+
+        /* ----- MODAL ----- */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.85);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            backdrop-filter: blur(4px);
+            animation: fadeIn 0.3s ease;
+        }
+        .modal-overlay.active {
+            display: flex;
+        }
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+        .modal {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            max-width: 480px;
+            width: 100%;
+            padding: 28px 24px;
+            box-shadow: var(--shadow);
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        .modal h2 {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+        .modal .sub {
+            color: var(--text-secondary);
+            font-size: 13px;
+            margin-bottom: 16px;
+        }
+        .modal label {
+            display: block;
+            font-weight: 500;
+            font-size: 13px;
+            margin-bottom: 4px;
+            color: var(--text-secondary);
+        }
+        .modal input,
+        .modal select {
+            width: 100%;
+            padding: 11px 14px;
+            background: var(--bg-input);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            color: var(--text-primary);
+            font-size: 14px;
+            margin-bottom: 14px;
+            transition: border 0.3s ease;
+        }
+        .modal input:focus,
+        .modal select:focus {
+            outline: none;
+            border-color: var(--accent-gold);
+        }
+        .modal select {
+            appearance: auto;
+        }
+        .modal .btn-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 4px;
+        }
+        .modal .btn-group .submit-btn {
+            flex: 1;
+            padding: 12px;
+            background: var(--accent-gold);
+            color: #000;
+            border: none;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 14px;
+            cursor: pointer;
+            transition: 0.3s ease;
+        }
+        .modal .btn-group .submit-btn:hover {
+            background: var(--accent-gold-hover);
+        }
+        .modal .btn-group .cancel-btn {
+            padding: 12px 20px;
+            background: rgba(255,255,255,0.06);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: 0.3s ease;
+        }
+        .modal .btn-group .cancel-btn:hover {
+            background: rgba(255,255,255,0.1);
+        }
+
+        /* ----- VIEWS ----- */
+        #adminView,
+        #clientView {
+            display: none;
+        }
+        #adminView .auth-box,
+        #clientView .auth-box {
+            display: block;
+        }
+        #adminView #adminDashboard,
+        #clientView #clientOrders {
+            display: none;
+        }
+
+        /* ----- RESPONSIVE ----- */
+        @media (max-width: 768px) {
+            .stats {
+                grid-template-columns: 1fr 1fr;
+            }
+            .order-card .top-row {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .toolbar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .progress-timeline {
+                flex-wrap: nowrap;
+                overflow-x: auto;
+                gap: 4px;
+            }
+            .progress-timeline::before {
+                display: none;
+            }
+            .progress-step .label {
+                font-size: 8px;
+                max-width: 40px;
+            }
+        }
+        @media (max-width: 480px) {
+            .stat-card .number {
+                font-size: 20px;
+            }
+            .progress-step .dot {
+                width: 16px;
+                height: 16px;
+                font-size: 8px;
+            }
+            .modal {
+                padding: 20px 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+
+        <!-- ===== HEADER ===== -->
+        <header class="header">
+            <div class="logo" onclick="window.location.reload()">
+                <div class="logo-icon">TS</div>
+                <div class="logo-text">Tradesphere<span>Hub</span></div>
+            </div>
+            <nav class="nav">
+                <a href="index.html">🏠 Home</a>
+                <a class="active" href="#">📊 Tracking</a>
+                <a href="portal.html">📦 Portal</a>
+            </nav>
+        </header>
+
+        <!-- ===== HERO ===== -->
+        <section class="hero">
+            <h1>Order Tracking</h1>
+            <p>Track your orders or manage them (admin).</p>
+        </section>
+
+        <!-- ============================================================ -->
+        <!-- ADMIN VIEW                                                    -->
+        <!-- ============================================================ -->
+        <div id="adminView">
+            <!-- Admin Login -->
+            <div class="auth-box" id="adminAuthBox">
+                <div class="icon">🔐</div>
+                <h2>Admin Access</h2>
+                <div class="sub">Enter your admin password to manage orders.</div>
+                <input type="password" id="adminPasswordInput" placeholder="Enter admin password..." />
+                <button class="auth-btn" id="adminLoginBtn">Access Orders</button>
+                <div class="error" id="adminAuthError">Incorrect password. Please try again.</div>
+            </div>
+
+            <!-- Admin Dashboard -->
+            <div id="adminDashboard">
+                <div class="stats" id="adminStats">
+                    <div class="stat-card"><div class="number" id="statTotal">0</div><div class="label">Total Orders</div></div>
+                    <div class="stat-card"><div class="number" id="statPending">0</div><div class="label">Pending</div></div>
+                    <div class="stat-card"><div class="number" id="statProcessing">0</div><div class="label">Processing</div></div>
+                    <div class="stat-card"><div class="number" id="statCompleted">0</div><div class="label">Completed</div></div>
+                </div>
+                <div class="toolbar">
+                    <button class="add-btn" id="createOrderBtn">+ Create Order</button>
+                </div>
+                <div id="adminOrderList"></div>
+            </div>
+        </div>
+
+        <!-- ============================================================ -->
+        <!-- CLIENT VIEW                                                  -->
+        <!-- ============================================================ -->
+        <div id="clientView">
+            <!-- Client Login -->
+            <div class="auth-box" id="clientAuthBox">
+                <div class="icon">🔍</div>
+                <h2>Track Your Orders</h2>
+                <div class="sub">Enter your email to see your order status.</div>
+                <input type="email" id="clientEmailInput" placeholder="Enter your email..." />
+                <button class="auth-btn" id="clientTrackBtn">Track Orders</button>
+                <div class="error" id="clientAuthError">No orders found for this email.</div>
+            </div>
+
+            <!-- Client Orders -->
+            <div id="clientOrders">
+                <div class="stats" id="clientStats">
+                    <div class="stat-card"><div class="number" id="clientStatTotal">0</div><div class="label">Total Orders</div></div>
+                    <div class="stat-card"><div class="number" id="clientStatPending">0</div><div class="label">Pending</div></div>
+                    <div class="stat-card"><div class="number" id="clientStatProcessing">0</div><div class="label">Processing</div></div>
+                    <div class="stat-card"><div class="number" id="clientStatCompleted">0</div><div class="label">Completed</div></div>
+                </div>
+                <div id="clientOrderList"></div>
+            </div>
+        </div>
+
+        <!-- ===== MODAL: Create Order ===== -->
+        <div class="modal-overlay" id="createOrderModal">
+            <div class="modal">
+                <h2>Create New Order</h2>
+                <div class="sub">Enter order details below.</div>
+
+                <label>Order Title *</label>
+                <input type="text" id="newOrderTitle" placeholder="e.g., TikTok 500 Followers" />
+
+                <label>Client Email *</label>
+                <input type="email" id="newOrderEmail" placeholder="e.g., client@example.com" />
+
+                <label>Status</label>
+                <select id="newOrderStatus">
+                    <option value="pending">⏳ Pending</option>
+                    <option value="processing">⚙️ Processing</option>
+                    <option value="progress">🔄 In Progress</option>
+                    <option value="completed">✅ Completed</option>
+                </select>
+
+                <div class="btn-group">
+                    <button class="submit-btn" id="saveOrderBtn">Create Order</button>
+                    <button class="cancel-btn" id="cancelOrderBtn">Cancel</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== FOOTER ===== -->
+        <div class="footer">
+            <p>© 2026 Tradesphere Hub · Order Tracking · v1.0</p>
+        </div>
+
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- JAVASCRIPT (All logic)                                       -->
+    <!-- ============================================================ -->
+    <script>
+        (function() {
+            'use strict';
+
+            // ---------- CONFIG ----------
+            const ADMIN_PASSWORD = 'admindelight200515$$';
+
+            // ---------- DOM REFS ----------
+            const adminView = document.getElementById('adminView');
+            const clientView = document.getElementById('clientView');
+
+            // Admin
+            const adminAuthBox = document.getElementById('adminAuthBox');
+            const adminPasswordInput = document.getElementById('adminPasswordInput');
+            const adminLoginBtn = document.getElementById('adminLoginBtn');
+            const adminAuthError = document.getElementById('adminAuthError');
+            const adminDashboard = document.getElementById('adminDashboard');
+            const adminOrderList = document.getElementById('adminOrderList');
+            const createOrderBtn = document.getElementById('createOrderBtn');
+            const createOrderModal = document.getElementById('createOrderModal');
+            const newOrderTitle = document.getElementById('newOrderTitle');
+            const newOrderEmail = document.getElementById('newOrderEmail');
+            const newOrderStatus = document.getElementById('newOrderStatus');
+            const saveOrderBtn = document.getElementById('saveOrderBtn');
+            const cancelOrderBtn = document.getElementById('cancelOrderBtn');
+
+            // Client
+            const clientAuthBox = document.getElementById('clientAuthBox');
+            const clientEmailInput = document.getElementById('clientEmailInput');
+            const clientTrackBtn = document.getElementById('clientTrackBtn');
+            const clientAuthError = document.getElementById('clientAuthError');
+            const clientOrders = document.getElementById('clientOrders');
+            const clientOrderList = document.getElementById('clientOrderList');
+
+            // Stats
+            const statTotal = document.getElementById('statTotal');
+            const statPending = document.getElementById('statPending');
+            const statProcessing = document.getElementById('statProcessing');
+            const statCompleted = document.getElementById('statCompleted');
+
+            const clientStatTotal = document.getElementById('clientStatTotal');
+            const clientStatPending = document.getElementById('clientStatPending');
+            const clientStatProcessing = document.getElementById('clientStatProcessing');
+            const clientStatCompleted = document.getElementById('clientStatCompleted');
+
+            // ---------- STATE ----------
+            let orders = [];
+            let currentClientEmail = '';
+
+            // ---------- UTILITY ----------
+            function generateId() {
+                return Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+            }
+
+            function formatDate(ts) {
+                if (!ts) return 'N/A';
+                return new Date(ts).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+            }
+
+            function getStatusLabel(status) {
+                const map = {
+                    pending: '⏳ Pending',
+                    processing: '⚙️ Processing',
+                    progress: '🔄 In Progress',
+                    completed: '✅ Completed',
+                    expired: '⏰ Expired'
+                };
+                return map[status] || status;
+            }
+
+            function getStatusClass(status) {
+                const map = {
+                    pending: 'status-pending',
+                    processing: 'status-processing',
+                    progress: 'status-progress',
+                    completed: 'status-completed',
+                    expired: 'status-expired'
+                };
+                return map[status] || '';
+            }
+
+            function getStatusMessage(status) {
+                const map = {
+                    pending: '⏳ Your order is pending. We\'ll start working on it soon.',
+                    processing: '⚙️ We\'re working on your order. Please wait.',
+                    progress: '🔄 Almost ready! We\'re testing your account.',
+                    completed: '🎯 Your order is ready! Check your WhatsApp for delivery details.',
+                    expired: '⚠️ This order has expired. Please contact admin for assistance.'
+                };
+                return map[status] || '';
+            }
+
+            function getProgressSteps(status) {
+                const steps = ['pending', 'processing', 'progress', 'completed'];
+                const idx = steps.indexOf(status);
+                return steps.map((s, i) => ({
+                    label: getStatusLabel(s).replace(/[⏳⚙️🔄✅]/g, '').trim(),
+                    status: i < idx ? 'completed' : i === idx ? 'active' : 'inactive'
+                }));
+            }
+
+            // ---------- STORAGE ----------
+            function loadOrders() {
+                try {
+                    const data = localStorage.getItem('tradesphere_orders');
+                    if (data) {
+                        orders = JSON.parse(data);
+                    } else {
+                        // Seed with demo orders
+                        orders = [{
+                            id: 'demo1',
+                            title: 'TikTok 500 Followers',
+                            email: 'demo@example.com',
+                            status: 'pending',
+                            createdAt: Date.now() - 86400000 * 3,
+                            updatedAt: Date.now() - 86400000 * 3
+                        }, {
+                            id: 'demo2',
+                            title: 'TikTok 1000 Followers',
+                            email: 'demo@example.com',
+                            status: 'processing',
+                            createdAt: Date.now() - 86400000 * 2,
+                            updatedAt: Date.now() - 86400000
+                        }, {
+                            id: 'demo3',
+                            title: 'TikTok 5000 Followers',
+                            email: 'demo@example.com',
+                            status: 'completed',
+                            createdAt: Date.now() - 86400000,
+                            updatedAt: Date.now() - 3600000
+                        }];
+                        saveOrders();
+                    }
+                } catch (e) {
+                    orders = [];
+                }
+                return orders;
+            }
+
+            function saveOrders() {
+                localStorage.setItem('tradesphere_orders', JSON.stringify(orders));
+            }
+
+            // ---------- RENDER HELPERS ----------
+            function renderAdminStats() {
+                const total = orders.length;
+                const pending = orders.filter(o => o.status === 'pending').length;
+                const processing = orders.filter(o => o.status === 'processing' || o.status === 'progress').length;
+                const completed = orders.filter(o => o.status === 'completed').length;
+                statTotal.textContent = total;
+                statPending.textContent = pending;
+                statProcessing.textContent = processing;
+                statCompleted.textContent = completed;
+            }
+
+            function renderClientStats(email) {
+                const userOrders = orders.filter(o => o.email === email);
+                const total = userOrders.length;
+                const pending = userOrders.filter(o => o.status === 'pending').length;
+                const processing = userOrders.filter(o => o.status === 'processing' || o.status === 'progress').length;
+                const completed = userOrders.filter(o => o.status === 'completed').length;
+                clientStatTotal.textContent = total;
+                clientStatPending.textContent = pending;
+                clientStatProcessing.textContent = processing;
+                clientStatCompleted.textContent = completed;
+            }
+
+            function renderAdminOrders() {
+                if (orders.length === 0) {
+                    adminOrderList.innerHTML = `
+                        <div class="empty-state">
+                            <div class="icon">📭</div>
+                            <h3>No orders yet</h3>
+                            <p>Click "Create Order" to add your first order.</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                let html = '';
+                for (let i = 0; i < orders.length; i++) {
+                    const o = orders[i];
+                    html += `
+                        <div class="order-card" data-id="${o.id}">
+                            <div class="top-row">
+                                <span class="order-title">📦 ${escapeHtml(o.title)}</span>
+                                <span class="order-date">📅 ${formatDate(o.createdAt)}</span>
+                            </div>
+                            <div class="order-details">
+                                <span>📧 <span class="client-email">${escapeHtml(o.email)}</span></span>
+                                <span>🆔 #${o.id.slice(0,8)}</span>
+                            </div>
+                            <div>
+                                <span class="status-badge ${getStatusClass(o.status)}">${getStatusLabel(o.status)}</span>
+                            </div>
+                            <div class="status-control">
+                                <select class="status-select" data-id="${o.id}">
+                                    <option value="pending" ${o.status === 'pending' ? 'selected' : ''}>⏳ Pending</option>
+                                    <option value="processing" ${o.status === 'processing' ? 'selected' : ''}>⚙️ Processing</option>
+                                    <option value="progress" ${o.status === 'progress' ? 'selected' : ''}>🔄 In Progress</option>
+                                    <option value="completed" ${o.status === 'completed' ? 'selected' : ''}>✅ Completed</option>
+                                    <option value="expired" ${o.status === 'expired' ? 'selected' : ''}>⏰ Expired</option>
+                                </select>
+                                <button class="update-btn" data-id="${o.id}">Update</button>
+                            </div>
+                            <div class="actions">
+                                <button class="delete-btn" data-id="${o.id}">🗑️ Delete</button>
+                            </div>
+                        </div>
+                    `;
+                }
+                adminOrderList.innerHTML = html;
+
+                // Attach event listeners
+                document.querySelectorAll('.update-btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const id = this.dataset.id;
+                        const select = document.querySelector(`.status-select[data-id="${id}"]`);
+                        const newStatus = select.value;
+                        updateOrderStatus(id, newStatus);
+                    });
+                });
+
+                document.querySelectorAll('.delete-btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const id = this.dataset.id;
+                        if (confirm('Delete this order?')) {
+                            deleteOrder(id);
+                        }
+                    });
+                });
+            }
+
+            function renderClientOrders(email) {
+                const userOrders = orders.filter(o => o.email === email);
+                if (userOrders.length === 0) {
+                    clientOrderList.innerHTML = `
+                        <div class="empty-state">
+                            <div class="icon">🔍</div>
+                            <h3>No orders found</h3>
+                            <p>We couldn't find any orders linked to this email.</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                let html = '';
+                for (let i = 0; i < userOrders.length; i++) {
+                    const o = userOrders[i];
+                    const steps = getProgressSteps(o.status);
+                    html += `
+                        <div class="order-card">
+                            <div class="top-row">
+                                <span class="order-title">📦 ${escapeHtml(o.title)}</span>
+                                <span class="order-date">📅 ${formatDate(o.createdAt)}</span>
+                            </div>
+                            <div class="order-details">
+                                <span>🆔 #${o.id.slice(0,8)}</span>
+                            </div>
+                            <div>
+                                <span class="status-badge ${getStatusClass(o.status)}">${getStatusLabel(o.status)}</span>
+                            </div>
+                            <div class="status-message">${getStatusMessage(o.status)}</div>
+                            <div class="progress-timeline">
+                                ${steps.map(step => `
+                                    <div class="progress-step">
+                                        <div class="dot ${step.status === 'active' ? 'active' : step.status === 'completed' ? 'completed' : ''}">
+                                            ${step.status === 'completed' ? '✅' : step.status === 'active' ? '●' : '○'}
+                                        </div>
+                                        <span class="label ${step.status === 'active' ? 'active' : step.status === 'completed' ? 'completed' : ''}">${step.label}</span>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    `;
+                }
+                clientOrderList.innerHTML = html;
+                renderClientStats(email);
+            }
+
+            // ---------- ACTIONS ----------
+            function updateOrderStatus(id, newStatus) {
+                const order = orders.find(o => o.id === id);
+                if (!order) return;
+                order.status = newStatus;
+                order.updatedAt = Date.now();
+                saveOrders();
+                renderAdminOrders();
+                renderAdminStats();
+                // If client view is open and matches email, re-render
+                if (currentClientEmail && order.email === currentClientEmail) {
+                    renderClientOrders(currentClientEmail);
+                }
+                showToast('Status updated to ' + getStatusLabel(newStatus), 'success');
+            }
+
+            function deleteOrder(id) {
+                orders = orders.filter(o => o.id !== id);
+                saveOrders();
+                renderAdminOrders();
+                renderAdminStats();
+                if (currentClientEmail) {
+                    renderClientOrders(currentClientEmail);
+                }
+                showToast('Order deleted.', 'info');
+            }
+
+            function createOrder(title, email, status) {
+                const newOrder = {
+                    id: generateId(),
+                    title: title.trim(),
+                    email: email.trim(),
+                    status: status || 'pending',
+                    createdAt: Date.now(),
+                    updatedAt: Date.now()
+                };
+                orders.push(newOrder);
+                saveOrders();
+                renderAdminOrders();
+                renderAdminStats();
+                showToast('Order created!', 'success');
+            }
+
+            // ---------- TOAST (simple) ----------
+            function showToast(message, type) {
+                const toast = document.createElement('div');
+                toast.style.cssText = `
+                    position: fixed;
+                    bottom: 24px;
+                    right: 24px;
+                    background: #141414;
+                    border: 1px solid #2A2A2A;
+                    border-left: 4px solid ${type === 'success' ? '#10B981' : type === 'error' ? '#EF4444' : '#F59E0B'};
+                    color: #fff;
+                    padding: 14px 24px;
+                    border-radius: 12px;
+                    font-family: 'Inter', sans-serif;
+                    font-size: 14px;
+                    font-weight: 500;
+                    box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+                    z-index: 9999;
+                    transform: translateY(100px);
+                    opacity: 0;
+                    transition: all 0.4s ease;
+                    max-width: 360px;
+                `;
+                toast.textContent = message;
+                document.body.appendChild(toast);
+                requestAnimationFrame(() => {
+                    toast.style.transform = 'translateY(0)';
+                    toast.style.opacity = '1';
+                });
+                setTimeout(() => {
+                    toast.style.transform = 'translateY(100px)';
+                    toast.style.opacity = '0';
+                    setTimeout(() => toast.remove(), 500);
+                }, 3000);
+            }
+
+            // ---------- ESCAPE HTML ----------
+            function escapeHtml(text) {
+                if (!text) return '';
+                const div = document.createElement('div');
+                div.textContent = text;
+                return div.innerHTML;
+            }
+
+            // ---------- VIEW SWITCHING ----------
+            function showAdminView() {
+                adminView.style.display = 'block';
+                clientView.style.display = 'none';
+                // Reset admin login state
+                adminAuthBox.style.display = 'block';
+                adminDashboard.style.display = 'none';
+                adminAuthError.style.display = 'none';
+                adminPasswordInput.value = '';
+            }
+
+            function showClientView() {
+                clientView.style.display = 'block';
+                adminView.style.display = 'none';
+                // Reset client login
+                clientAuthBox.style.display = 'block';
+                clientOrders.style.display = 'none';
+                clientAuthError.style.display = 'none';
+                clientEmailInput.value = '';
+                currentClientEmail = '';
+            }
+
+            // ---------- EVENT HANDLERS ----------
+            // Admin login
+            adminLoginBtn.addEventListener('click', function() {
+                const pw = adminPasswordInput.value.trim();
+                if (pw === ADMIN_PASSWORD) {
+                    adminAuthBox.style.display = 'none';
+                    adminDashboard.style.display = 'block';
+                    adminAuthError.style.display = 'none';
+                    loadOrders();
+                    renderAdminStats();
+                    renderAdminOrders();
+                } else {
+                    adminAuthError.style.display = 'block';
+                    setTimeout(() => { adminAuthError.style.display = 'none'; }, 3000);
+                }
+            });
+            adminPasswordInput.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') adminLoginBtn.click();
+            });
+
+            // Client tracking
+            clientTrackBtn.addEventListener('click', function() {
+                const email = clientEmailInput.value.trim();
+                if (!email) {
+                    clientAuthError.textContent = 'Please enter your email.';
+                    clientAuthError.style.display = 'block';
+                    return;
+                }
+                const userOrders = orders.filter(o => o.email === email);
+                if (userOrders.length === 0) {
+                    clientAuthError.textContent = 'No orders found for this email.';
+                    clientAuthError.style.display = 'block';
+                    setTimeout(() => { clientAuthError.style.display = 'none'; }, 3000);
+                    return;
+                }
+                clientAuthBox.style.display = 'none';
+                clientOrders.style.display = 'block';
+                currentClientEmail = email;
+                renderClientOrders(email);
+            });
+            clientEmailInput.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') clientTrackBtn.click();
+            });
+
+            // Create Order Modal
+            createOrderBtn.addEventListener('click', function() {
+                createOrderModal.classList.add('active');
+                newOrderTitle.value = '';
+                newOrderEmail.value = '';
+                newOrderStatus.value = 'pending';
+            });
+
+            cancelOrderBtn.addEventListener('click', function() {
+                createOrderModal.classList.remove('active');
+            });
+
+            createOrderModal.addEventListener('click', function(e) {
+                if (e.target === this) {
+                    createOrderModal.classList.remove('active');
+                }
+            });
+
+            saveOrderBtn.addEventListener('click', function() {
+                const title = newOrderTitle.value.trim();
+                const email = newOrderEmail.value.trim();
+                const status = newOrderStatus.value;
+                if (!title) {
+                    showToast('Please enter an order title.', 'error');
+                    return;
+                }
+                if (!email) {
+                    showToast('Please enter a client email.', 'error');
+                    return;
+                }
+                createOrder(title, email, status);
+                createOrderModal.classList.remove('active');
+            });
+
+            // ---------- INIT ----------
+            function init() {
+                // By default show client view (public)
+                showClientView();
+                // But if we have a query parameter ?admin, show admin
+                const params = new URLSearchParams(window.location.search);
+                if (params.get('admin') === 'true') {
+                    showAdminView();
+                }
+                // Load orders once
+                loadOrders();
+            }
+
+            // Handle back/forward for views
+            window.addEventListener('popstate', function() {
+                const params = new URLSearchParams(window.location.search);
+                if (params.get('admin') === 'true') {
+                    showAdminView();
+                } else {
+                    showClientView();
+                }
+            });
+
+            init();
+
+            console.log('📊 Order Tracking loaded.');
+            console.log('🔑 Admin password: admindelight200515$$');
+            console.log('👤 Demo client: demo@example.com');
+
+        })();
+    </script>
+
+</body>
+</html>
