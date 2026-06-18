@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test – Add Client & Export</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body { background: #0A0A0A; color: #fff; font-family: sans-serif; padding: 20px; }
+        .btn { background: #F59E0B; color: #000; border: none; padding: 12px 24px; border-radius: 40px; font-weight: 700; font-size: 16px; cursor: pointer; margin: 10px 0; }
+        .btn:hover { background: #D97706; }
+        .btn-danger { background: #EF4444; color: #fff; }
+        .btn-danger:hover { background: #DC2626; }
+        .card { background: #141414; border: 1px solid #2A2A2A; border-radius: 12px; padding: 16px; margin: 10px 0; }
+        .card .name { font-weight: 700; font-size: 18px; }
+        .card .email { color: #A0A0A0; font-size: 14px; }
+        .card .pass { color: #F59E0B; font-family: monospace; }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.85);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .modal.active { display: flex; }
+        .modal-content {
+            background: #141414;
+            padding: 30px;
+            border-radius: 16px;
+            max-width: 420px;
+            width: 100%;
+            border: 1px solid #2A2A2A;
+        }
+        .modal-content label { display: block; font-size: 13px; color: #A0A0A0; margin-bottom: 4px; }
+        .modal-content input {
+            width: 100%;
+            padding: 12px;
+            background: #1E1E1E;
+            border: 1px solid #2A2A2A;
+            border-radius: 8px;
+            color: #fff;
+            margin-bottom: 12px;
+            font-size: 14px;
+        }
+        .modal-content input:focus { outline: none; border-color: #F59E0B; }
+        .modal-content .btn-group { display: flex; gap: 10px; }
+        .modal-content .btn-group .btn { flex: 1; text-align: center; margin: 0; }
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #141414;
+            border: 1px solid #2A2A2A;
+            border-radius: 12px;
+            padding: 12px 20px;
+            color: #fff;
+            font-size: 14px;
+            z-index: 2000;
+            transform: translateY(80px);
+            opacity: 0;
+            transition: all 0.4s ease;
+        }
+        .toast.show { transform: translateY(0); opacity: 1; }
+        .toast.success { border-left: 4px solid #10B981; }
+        .toast.error { border-left: 4px solid #EF4444; }
+    </style>
+</head>
+<body>
+
+    <h1>🧪 Test: Add Client + Export</h1>
+    <p style="color:#A0A0A0;">If these buttons work, the issue is in the main portal — we'll fix it.</p>
+
+    <div>
+        <button class="btn" id="testAddBtn">+ Add Client (Test)</button>
+        <button class="btn" id="testExportBtn">📤 Export CSV (Test)</button>
+    </div>
+
+    <div id="clientList"></div>
+
+    <!-- MODAL -->
+    <div class="modal" id="testModal">
+        <div class="modal-content">
+            <h2>Add Client</h2>
+            <label>Name *</label>
+            <input type="text" id="testName" placeholder="John Smith" />
+            <label>Email</label>
+            <input type="email" id="testEmail" placeholder="john@example.com" />
+            <label>Password *</label>
+            <input type="text" id="testPass" placeholder="Set a password" />
+            <div class="btn-group">
+                <button class="btn" id="testSaveBtn">Save</button>
+                <button class="btn btn-danger" id="testCancelBtn">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast" id="testToast"></div>
+
+    <script>
+        (function() {
+            'use strict';
+
+            let clients = [];
+
+            // Toast
+            function showToast(msg, type) {
+                var t = document.getElementById('testToast');
+                t.textContent = msg;
+                t.className = 'toast ' + type + ' show';
+                clearTimeout(t._timer);
+                t._timer = setTimeout(function() { t.className = 'toast'; }, 3000);
+            }
+
+            // Storage
+            function loadClients() {
+                try {
+                    var data = localStorage.getItem('test_clients');
+                    clients = data ? JSON.parse(data) : [];
+                } catch(e) { clients = []; }
+                return clients;
+            }
+
+            function saveClients() {
+                localStorage.setItem('test_clients', JSON.stringify(clients));
+            }
+
+            function renderClients() {
+                loadClients();
+                var container = document.getElementById('clientList');
+                if (clients.length === 0) {
+                    container.innerHTML = '<p style="color:#A0A0A0;">No clients yet. Click "Add Client".</p>';
+                    return;
+                }
+                var html = '';
+                for (var i = 0; i < clients.length; i++) {
+                    var c = clients[i];
+                    html += '<div class="card">';
+                    html += '<div class="name">' + c.name + '</div>';
+                    html += '<div class="email">' + c.email + '</div>';
+                    html += '<div class="pass">🔑 ' + c.password + '</div>';
+                    html += '</div>';
+                }
+                container.innerHTML = html;
+            }
+
+            // MODAL
+            function openModal() {
+                document.getElementById('testModal').classList.add('active');
+                document.getElementById('testName').value = '';
+                document.getElementById('testEmail').value = '';
+                document.getElementById('testPass').value = '';
+            }
+
+            function closeModal() {
+                document.getElementById('testModal').classList.remove('active');
+            }
+
+            function saveClient() {
+                var name = document.getElementById('testName').value.trim();
+                var email = document.getElementById('testEmail').value.trim();
+                var pass = document.getElementById('testPass').value.trim();
+
+                if (!name) { showToast('Please enter a name.', 'error'); return; }
+                if (!pass) { showToast('Please set a password.', 'error'); return; }
+
+                var newClient = {
+                    id: Date.now().toString(36) + Math.random().toString(36).slice(2, 5),
+                    name: name,
+                    email: email || '',
+                    password: pass
+                };
+
+                loadClients();
+                clients.push(newClient);
+                saveClients();
+                closeModal();
+                renderClients();
+                showToast('✅ Client added!', 'success');
+            }
+
+            // EXPORT CSV
+            function exportCSV() {
+                loadClients();
+                if (clients.length === 0) {
+                    showToast('No clients to export.', 'error');
+                    return;
+                }
+                var csv = 'Name,Email,Password\n';
+                for (var i = 0; i < clients.length; i++) {
+                    csv += '"' + clients[i].name + '","' + (clients[i].email || '') + '","' + clients[i].password + '"\n';
+                }
+                var blob = new Blob([csv], { type: 'text/csv' });
+                var url = URL.createObjectURL(blob);
+                var a = document.createElement('a');
+                a.href = url;
+                a.download = 'test_clients_' + new Date().toISOString().slice(0,10) + '.csv';
+                a.click();
+                URL.revokeObjectURL(url);
+                showToast('📤 CSV exported!', 'success');
+            }
+
+            // EVENT LISTENERS
+            document.getElementById('testAddBtn').addEventListener('click', openModal);
+            document.getElementById('testCancelBtn').addEventListener('click', closeModal);
+            document.getElementById('testSaveBtn').addEventListener('click', saveClient);
+            document.getElementById('testExportBtn').addEventListener('click', exportCSV);
+
+            // INIT
+            loadClients();
+            renderClients();
+            console.log('🧪 Test page loaded. Clients:', clients.length);
+
+        })();
+    </script>
+
+</body>
+</html>
