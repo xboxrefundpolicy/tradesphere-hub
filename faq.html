@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>FAQ / Help – Tradesphere Hub</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+    <script data-goatcounter="https://tradespherehub.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        :root {
+            --bg-primary: #0A0A0A;
+            --bg-card: #141414;
+            --bg-input: #1E1E1E;
+            --border-color: #2A2A2A;
+            --text-primary: #FFFFFF;
+            --text-secondary: #A0A0A0;
+            --accent-gold: #F59E0B;
+            --accent-gold-hover: #D97706;
+            --radius: 16px;
+            --shadow: 0 8px 32px rgba(0,0,0,0.5);
+            --success: #10B981;
+            --danger: #EF4444;
+            --info: #3B82F6;
+        }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .container { max-width: 800px; width:100%; }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0 16px;
+            border-bottom: 1px solid var(--border-color);
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .logo { display: flex; align-items: center; gap: 10px; cursor: pointer; }
+        .logo-icon {
+            background: linear-gradient(135deg, var(--accent-gold), #FBBF24);
+            color: #000; width: 38px; height: 38px; border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 18px; font-weight: 800;
+        }
+        .logo-text { font-size: 20px; font-weight: 800; letter-spacing: -0.5px; }
+        .logo-text span { color: var(--accent-gold); }
+        .nav { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+        .nav a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 500;
+            padding: 6px 12px;
+            border-radius: 8px;
+            transition: 0.3s ease;
+        }
+        .nav a:hover { color: var(--text-primary); background: rgba(255,255,255,0.05); }
+        .nav a.active { color: var(--accent-gold); background: rgba(245,158,11,0.1); }
+
+        .hero { text-align: center; padding: 28px 0 20px; }
+        .hero h1 {
+            font-size: 32px; font-weight: 800;
+            background: linear-gradient(135deg, #fff 40%, var(--accent-gold));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+            letter-spacing: -1px;
+        }
+        .hero p { color: var(--text-secondary); font-size: 15px; max-width: 480px; margin: 8px auto 0; }
+
+        /* ===== FAQ LIST ===== */
+        .faq-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin: 20px 0 32px;
+        }
+        .faq-item {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        .faq-item:hover { border-color: var(--accent-gold); }
+
+        .faq-item .question {
+            padding: 18px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 16px;
+            transition: 0.2s;
+            user-select: none;
+            gap: 16px;
+            background: transparent;
+            border: none;
+            width: 100%;
+            text-align: left;
+            color: var(--text-primary);
+            font-family: inherit;
+        }
+        .faq-item .question:hover { background: rgba(255,255,255,0.03); }
+        .faq-item .question .arrow {
+            font-size: 18px;
+            transition: transform 0.3s ease;
+            flex-shrink: 0;
+            color: var(--accent-gold);
+        }
+        .faq-item .answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease, padding 0.4s ease;
+            padding: 0 24px;
+            color: var(--text-secondary);
+            font-size: 14px;
+            line-height: 1.8;
+        }
+        .faq-item .answer p { padding: 0 0 14px; margin: 0; }
+        .faq-item .answer ul { padding-left: 20px; margin: 6px 0 14px; }
+        .faq-item .answer ul li { margin-bottom: 4px; }
+        .faq-item .answer .highlight { color: var(--accent-gold); font-weight: 500; }
+        .faq-item .answer .step { display: block; margin-top: 6px; padding-left: 8px; border-left: 2px solid var(--accent-gold); }
+        .faq-item .answer .step strong { color: var(--text-primary); }
+
+        /* Contact Buttons */
+        .contact-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 12px 0 6px;
+        }
+        .contact-buttons .btn-wa {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 24px;
+            background: #25D366;
+            color: #000;
+            border: none;
+            border-radius: 40px;
+            font-weight: 700;
+            font-size: 14px;
+            text-decoration: none;
+            transition: 0.3s ease;
+        }
+        .contact-buttons .btn-wa:hover {
+            background: #1ebe57;
+            transform: scale(1.02);
+        }
+        .contact-buttons .btn-email {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 24px;
+            background: rgba(255,255,255,0.06);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            border-radius: 40px;
+            font-weight: 600;
+            font-size: 14px;
+            text-decoration: none;
+            transition: 0.3s ease;
+        }
+        .contact-buttons .btn-email:hover {
+            background: rgba(255,255,255,0.1);
+            border-color: var(--accent-gold);
+        }
+
+        .faq-item.open .question .arrow { transform: rotate(180deg); }
+        .faq-item.open .answer { max-height: 900px; padding: 0 24px 6px; }
+
+        /* ===== COPY LINK ===== */
+        .copy-link-section {
+            text-align: center;
+            margin: 24px 0 32px;
+            padding: 20px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+        }
+        .copy-link-section .btn {
+            display: inline-block;
+            padding: 12px 32px;
+            background: var(--accent-gold);
+            color: #000;
+            border: none;
+            border-radius: 40px;
+            font-weight: 700;
+            font-size: 15px;
+            cursor: pointer;
+            transition: 0.3s ease;
+            text-decoration: none;
+        }
+        .copy-link-section .btn:hover { background: var(--accent-gold-hover); transform: scale(1.02); }
+        .copy-link-section .helper {
+            color: var(--text-secondary);
+            font-size: 13px;
+            margin-top: 8px;
+        }
+
+        /* ===== TOAST ===== */
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            padding: 14px 24px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            color: var(--text-primary);
+            font-size: 14px;
+            font-weight: 500;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+            z-index: 2000;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.4s ease;
+            max-width: 360px;
+        }
+        .toast.visible { transform: translateY(0); opacity: 1; }
+        .toast.success { border-color: var(--success); border-left: 4px solid var(--success); }
+        .toast.error { border-color: var(--danger); border-left: 4px solid var(--danger); }
+        .toast.info { border-color: var(--accent-gold); border-left: 4px solid var(--accent-gold); }
+
+        .footer { margin-top: 32px; padding-top: 16px; border-top: 1px solid var(--border-color); text-align: center; font-size: 11px; color: var(--text-secondary); }
+
+        @media (max-width: 480px) {
+            .faq-item .question { padding: 14px 16px; font-size: 14px; }
+            .faq-item .answer { font-size: 13px; }
+            .faq-item.open .answer { padding: 0 16px 6px; }
+            .copy-link-section .btn { width: 100%; }
+            .contact-buttons .btn-wa,
+            .contact-buttons .btn-email { width: 100%; justify-content: center; }
+        }
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: var(--bg-primary); }
+        ::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--accent-gold); }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+
+        <header class="header">
+            <div class="logo" onclick="window.location.reload()">
+                <div class="logo-icon">TS</div>
+                <div class="logo-text">Tradesphere<span>Hub</span></div>
+            </div>
+            <nav class="nav">
+                <a href="index.html">🏠 Home</a>
+                <a href="waiting.html">📋 Waiting List</a>
+                <a class="active" href="#">❓ FAQ</a>
+            </nav>
+        </header>
+
+        <section class="hero">
+            <h1>❓ Frequently Asked Questions</h1>
+            <p>Find answers to the most common questions about our services.</p>
+        </section>
+
+        <div class="faq-list">
+
+            <!-- Q1: What is Tradesphere Hub? -->
+            <div class="faq-item open">
+                <button class="question" onclick="toggleFaq(this)">
+                    <span>📦 What is Tradesphere Hub?</span>
+                    <span class="arrow">▼</span>
+                </button>
+                <div class="answer">
+                    <p>
+                        <span class="highlight">Tradesphere Hub</span> is an all‑in‑one platform built for businesses that sell TikTok logs, accounts, and digital services.
+                    </p>
+                    <ul>
+                        <li><strong>📦 Client Portal</strong> – Upload logs, share secure links, and let clients view their files with a password.</li>
+                        <li><strong>📊 Order Tracking</strong> – Create orders, update status, and share real‑time progress with clients.</li>
+                        <li><strong>🎁 Gift Hub</strong> – Create gift codes and reward your clients instantly.</li>
+                        <li><strong>🔗 Referral System</strong> – Track referrals and auto‑reward clients who bring in new business.</li>
+                        <li><strong>📋 Waiting List</strong> – Capture leads when you're out of stock and notify them instantly.</li>
+                        <li><strong>🔐 VPN &amp; TikTok Vault</strong> – Securely store and manage VPN logins and TikTok account passwords.</li>
+                        <li><strong>📣 Announcements</strong> – Post updates and notify your community.</li>
+                    </ul>
+                    <p>
+                        All services are accessible from a single dashboard with password protection, so you control who sees what.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Q2: How do I access my logs? -->
+            <div class="faq-item">
+                <button class="question" onclick="toggleFaq(this)">
+                    <span>🔑 How do I access my logs?</span>
+                    <span class="arrow">▼</span>
+                </button>
+                <div class="answer">
+                    <ul>
+                        <li><strong>Step 1:</strong> You'll receive a unique link from your admin (usually via WhatsApp or email).</li>
+                        <li><strong>Step 2:</strong> Click the link. It will open the <span class="highlight">Client Portal</span>.</li>
+                        <li><strong>Step 3:</strong> Enter the password that was provided to you by the admin.</li>
+                        <li><strong>Step 4:</strong> Your logs will appear instantly – you can view, copy, or download them.</li>
+                    </ul>
+                    <p>⚠️ <strong>Important:</strong> Keep your password safe. If you enter it incorrectly 3 times, your account will be temporarily locked for 15 minutes.</p>
+                </div>
+            </div>
+
+            <!-- Q3: How do I redeem a gift? -->
+            <div class="faq-item">
+                <button class="question" onclick="toggleFaq(this)">
+                    <span>🎁 How do I redeem a gift?</span>
+                    <span class="arrow">▼</span>
+                </button>
+                <div class="answer">
+                    <ul>
+                        <li><strong>Step 1:</strong> Click the gift link you received (or go to the <span class="highlight">Gift Hub</span> page).</li>
+                        <li><strong>Step 2:</strong> If you have a gift code, enter it in the redemption field.</li>
+                        <li><strong>Step 3:</strong> If the gift is set to auto‑convert, you'll be asked to enter your email address.</li>
+                        <li><strong>Step 4:</strong> After redemption, you'll either see your gift instantly or receive a client account with logs attached.</li>
+                    </ul>
+                    <p>💡 <strong>Tip:</strong> Some gifts expire after a certain number of days – redeem them before the expiry date to avoid losing them.</p>
+                </div>
+            </div>
+
+            <!-- Q4: What is the waiting list? -->
+            <div class="faq-item">
+                <button class="question" onclick="toggleFaq(this)">
+                    <span>📋 What is the waiting list?</span>
+                    <span class="arrow">▼</span>
+                </button>
+                <div class="answer">
+                    <ul>
+                        <li><strong>Step 1:</strong> Visit the Waiting List page and enter your <strong>name</strong> and <strong>email</strong>.</li>
+                        <li><strong>Step 2:</strong> You'll receive a confirmation message that you're on the list.</li>
+                        <li><strong>Step 3:</strong> As soon as new logs become available, we'll notify you via email or WhatsApp.</li>
+                        <li><strong>Step 4:</strong> You'll get priority access to purchase before the general public.</li>
+                    </ul>
+                    <p>✅ Joining the waiting list is completely free and takes less than 30 seconds.</p>
+                </div>
+            </div>
+
+            <!-- Q5: Is my data secure? -->
+            <div class="faq-item">
+                <button class="question" onclick="toggleFaq(this)">
+                    <span>🛡️ Is my data secure?</span>
+                    <span class="arrow">▼</span>
+                </button>
+                <div class="answer">
+                    <ul>
+                        <li><strong>🔒 Password Protection:</strong> The entire dashboard is protected by a password that only you (the admin) know.</li>
+                        <li><strong>📦 Client‑Specific Links:</strong> Each client gets a unique, random link. No one can guess another client's link.</li>
+                        <li><strong>📁 Local Storage:</strong> All data is stored locally in your browser. We don't store your data on external servers unless you choose to back it up.</li>
+                        <li><strong>⏳ Auto‑Lockout:</strong> After 3 failed login attempts, the client account is locked for 15 minutes to prevent brute‑force attacks.</li>
+                        <li><strong>🔄 Backup &amp; Restore:</strong> You can backup your data anytime and restore it if needed – giving you full control.</li>
+                    </ul>
+                    <p>🔐 <strong>Bottom line:</strong> Your data stays with you, and you control who has access.</p>
+                </div>
+            </div>
+
+            <!-- Q6: How can I contact support? -->
+            <div class="faq-item">
+                <button class="question" onclick="toggleFaq(this)">
+                    <span>📧 How can I contact support?</span>
+                    <span class="arrow">▼</span>
+                </button>
+                <div class="answer">
+                    <p>We're here to help! You can reach us in two easy ways:</p>
+                    <div class="contact-buttons">
+                        <a href="https://api.whatsapp.com/send?phone=2348165181348" target="_blank" class="btn-wa">
+                            💬 WhatsApp
+                        </a>
+                        <a href="mailto:tradespherehub@proton.me" class="btn-email">
+                            📧 Email
+                        </a>
+                    </div>
+                    <ul>
+                        <li><strong>💬 WhatsApp:</strong> Tap the WhatsApp button above to chat with us directly. We typically respond within a few hours.</li>
+                        <li><strong>📧 Email:</strong> Send us an email at <span class="highlight">tradespherehub@proton.me</span> – we'll get back to you within 24 hours.</li>
+                    </ul>
+                    <p>⚡ <strong>For urgent issues, WhatsApp is the fastest way to reach us.</strong></p>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Copy Link Section -->
+        <div class="copy-link-section">
+            <button class="btn" id="copyFaqLinkBtn">📋 Copy FAQ Link</button>
+            <div class="helper">Share this page with clients using the link above.</div>
+        </div>
+
+        <div class="toast" id="toast"></div>
+
+        <div class="footer">
+            <p>© 2026 Tradesphere Hub · FAQ / Help · v2.0</p>
+        </div>
+
+    </div>
+
+    <!-- ===== ELFSIGHT AI CHATBOT (FIXED - Non-Lazy Version) ===== -->
+    <script src="https://elfsightcdn.com/platform.js" async></script>
+    <div class="elfsight-app-a528cfe0-fdca-4247-8712-ee2380a9e450"></div>
+
+    <script>
+        (function() {
+            'use strict';
+
+            // ---------- FAQ TOGGLE ----------
+            function toggleFaq(element) {
+                const parent = element.closest('.faq-item');
+                const wasOpen = parent.classList.contains('open');
+
+                // Close all other items
+                document.querySelectorAll('.faq-item').forEach(function(item) {
+                    item.classList.remove('open');
+                });
+
+                // If it was closed, open it
+                if (!wasOpen) {
+                    parent.classList.add('open');
+                }
+            }
+
+            // ---------- TOAST ----------
+            const toast = document.getElementById('toast');
+
+            function showToast(msg, type) {
+                type = type || 'info';
+                toast.textContent = msg;
+                toast.className = 'toast ' + type + ' visible';
+                clearTimeout(toast._timeout);
+                toast._timeout = setTimeout(function() {
+                    toast.classList.remove('visible');
+                }, 3000);
+            }
+
+            // ---------- COPY LINK ----------
+            function copyLink() {
+                const link = window.location.href;
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    navigator.clipboard.writeText(link).then(function() {
+                        showToast('✅ FAQ link copied to clipboard!', 'success');
+                    }).catch(function() {
+                        fallbackCopy(link);
+                    });
+                } else {
+                    fallbackCopy(link);
+                }
+            }
+
+            function fallbackCopy(text) {
+                const textarea = document.createElement('textarea');
+                textarea.value = text;
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textarea);
+                showToast('✅ FAQ link copied to clipboard!', 'success');
+            }
+
+            // ---------- EVENT LISTENERS ----------
+            document.getElementById('copyFaqLinkBtn').addEventListener('click', copyLink);
+
+            // ---------- AUTO-OPEN FIRST FAQ ----------
+            document.addEventListener('DOMContentLoaded', function() {
+                const firstItem = document.querySelector('.faq-item');
+                if (firstItem) {
+                    firstItem.classList.add('open');
+                }
+            });
+
+            // Expose toggleFaq globally for inline onclick
+            window.toggleFaq = toggleFaq;
+
+            console.log('❓ FAQ v2.0 (with AI Chatbot) loaded');
+
+        })();
+    </script>
+
+</body>
+</html>
