@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>Feedback & Reviews – Tradesphere Hub</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+    <script data-goatcounter="https://tradespherehub.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        :root {
+            --bg-primary: #0A0A0A;
+            --bg-card: #141414;
+            --bg-input: #1E1E1E;
+            --border-color: #2A2A2A;
+            --text-primary: #FFFFFF;
+            --text-secondary: #A0A0A0;
+            --accent-gold: #F59E0B;
+            --accent-gold-hover: #D97706;
+            --radius: 16px;
+            --shadow: 0 8px 32px rgba(0,0,0,0.5);
+            --success: #10B981;
+            --danger: #EF4444;
+            --warning: #F59E0B;
+            --info: #3B82F6;
+        }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .container { max-width: 1100px; width:100%; }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0 16px;
+            border-bottom: 1px solid var(--border-color);
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .logo { display: flex; align-items: center; gap: 10px; cursor: pointer; }
+        .logo-icon {
+            background: linear-gradient(135deg, var(--accent-gold), #FBBF24);
+            color: #000; width: 38px; height: 38px; border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 18px; font-weight: 800;
+        }
+        .logo-text { font-size: 20px; font-weight: 800; letter-spacing: -0.5px; }
+        .logo-text span { color: var(--accent-gold); }
+        .nav { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+        .nav a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 500;
+            padding: 6px 12px;
+            border-radius: 8px;
+            transition: 0.3s ease;
+        }
+        .nav a:hover { color: var(--text-primary); background: rgba(255,255,255,0.05); }
+        .nav a.active { color: var(--accent-gold); background: rgba(245,158,11,0.1); }
+
+        .hero { text-align: center; padding: 28px 0 20px; }
+        .hero h1 {
+            font-size: 32px; font-weight: 800;
+            background: linear-gradient(135deg, #fff 40%, var(--accent-gold));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+            letter-spacing: -1px;
+        }
+        .hero p { color: var(--text-secondary); font-size: 15px; max-width: 480px; margin: 8px auto 0; }
+
+        /* ===== ADMIN AUTH ===== */
+        #authScreen {
+            max-width: 400px; margin: 40px auto;
+            background: var(--bg-card); border: 1px solid var(--border-color);
+            border-radius: var(--radius); padding: 32px 28px;
+            box-shadow: var(--shadow);
+            display: none;
+        }
+        #authScreen h2 { font-size: 22px; font-weight: 700; margin-bottom: 6px; text-align: center; }
+        #authScreen p { color: var(--text-secondary); font-size: 14px; text-align: center; margin-bottom: 20px; }
+        #authScreen input {
+            width: 100%; padding: 14px 16px; background: var(--bg-input);
+            border: 1px solid var(--border-color); border-radius: 10px;
+            color: var(--text-primary); font-size: 15px; margin-bottom: 14px;
+            transition: border 0.3s ease;
+        }
+        #authScreen input:focus { outline: none; border-color: var(--accent-gold); }
+        #authScreen .auth-btn {
+            width: 100%; padding: 14px; background: var(--accent-gold);
+            color: #000; border: none; border-radius: 10px;
+            font-weight: 700; font-size: 16px; cursor: pointer; transition: 0.3s ease;
+        }
+        #authScreen .auth-btn:hover { background: var(--accent-gold-hover); transform: scale(1.01); }
+        #authScreen .auth-error { color: var(--danger); font-size: 13px; text-align: center; margin-top: 12px; display: none; }
+        #authScreen .back-link {
+            display: block; margin-top: 16px; color: var(--text-secondary); font-size: 13px; text-decoration: none; text-align: center; transition: 0.3s;
+        }
+        #authScreen .back-link:hover { color: var(--accent-gold); }
+
+        /* ===== ADMIN DASHBOARD ===== */
+        #adminDashboard { display: none; }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 12px; margin-bottom: 24px;
+        }
+        .stat-card {
+            background: var(--bg-card); border: 1px solid var(--border-color);
+            border-radius: 12px; padding: 16px; text-align: center;
+            transition: border 0.3s ease;
+        }
+        .stat-card:hover { border-color: var(--accent-gold); }
+        .stat-card .number { font-size: 24px; font-weight: 800; color: var(--accent-gold); }
+        .stat-card .label { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
+
+        .admin-tabs {
+            display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap;
+        }
+        .admin-tabs .tab {
+            padding: 10px 20px; border-radius: 40px; border: 1px solid var(--border-color);
+            background: transparent; color: var(--text-secondary); font-weight: 600; font-size: 13px;
+            cursor: pointer; transition: 0.3s ease; font-family: inherit;
+        }
+        .admin-tabs .tab:hover { border-color: var(--accent-gold); color: var(--text-primary); }
+        .admin-tabs .tab.active { background: var(--accent-gold); color: #000; border-color: var(--accent-gold); }
+
+        .admin-toolbar {
+            display: flex; justify-content: space-between; align-items: center;
+            flex-wrap: wrap; gap: 12px; margin-bottom: 16px;
+        }
+        .admin-toolbar .search-box {
+            display: flex; align-items: center; background: var(--bg-input);
+            border: 1px solid var(--border-color); border-radius: 10px; padding: 0 14px;
+            flex: 1; min-width: 160px; max-width: 300px;
+        }
+        .admin-toolbar .search-box input {
+            background: transparent; border: none; padding: 10px 8px;
+            color: var(--text-primary); font-size: 14px; width: 100%;
+        }
+        .admin-toolbar .search-box input:focus { outline: none; }
+        .admin-toolbar .search-box .icon { color: var(--text-secondary); font-size: 16px; }
+        .admin-toolbar .actions { display: flex; gap: 8px; flex-wrap: wrap; }
+        .admin-toolbar .btn {
+            padding: 8px 18px; border-radius: 40px; border: none;
+            font-weight: 600; font-size: 13px; cursor: pointer; transition: 0.3s ease;
+            white-space: nowrap; font-family: inherit;
+        }
+        .admin-toolbar .btn-primary { background: var(--accent-gold); color: #000; }
+        .admin-toolbar .btn-primary:hover { background: var(--accent-gold-hover); }
+        .admin-toolbar .btn-secondary { background: rgba(255,255,255,0.06); color: var(--text-primary); border: 1px solid var(--border-color); }
+        .admin-toolbar .btn-secondary:hover { background: rgba(255,255,255,0.1); }
+
+        .review-grid {
+            display: grid; grid-template-columns: 1fr;
+            gap: 14px; margin-top: 12px;
+        }
+        .review-card {
+            background: var(--bg-card); border: 1px solid var(--border-color);
+            border-radius: var(--radius); padding: 18px;
+            transition: all 0.3s ease;
+        }
+        .review-card:hover { border-color: var(--accent-gold); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.3); }
+        .review-card .top-row {
+            display: flex; justify-content: space-between; align-items: flex-start;
+            flex-wrap: wrap; gap: 8px; margin-bottom: 4px;
+        }
+        .review-card .client-name { font-size: 17px; font-weight: 700; }
+        .review-card .client-email { color: var(--text-secondary); font-size: 13px; }
+        .review-card .rating { color: var(--accent-gold); font-size: 16px; letter-spacing: 1px; }
+        .review-card .review-text {
+            color: var(--text-secondary); font-size: 14px; line-height: 1.6; margin: 8px 0;
+            background: var(--bg-input); padding: 10px 14px; border-radius: 8px;
+            border-left: 3px solid var(--accent-gold);
+        }
+        .review-card .feature-text {
+            color: var(--text-secondary); font-size: 14px; line-height: 1.6; margin: 8px 0;
+            background: var(--bg-input); padding: 10px 14px; border-radius: 8px;
+            border-left: 3px solid var(--info);
+        }
+        .review-card .meta { font-size: 12px; color: var(--text-secondary); margin: 6px 0; }
+        .review-card .bottom-row {
+            display: flex; justify-content: space-between; align-items: center;
+            flex-wrap: wrap; gap: 8px; margin-top: 10px;
+        }
+        .review-card .status-select {
+            padding: 4px 10px; background: var(--bg-input); border: 1px solid var(--border-color);
+            border-radius: 6px; color: var(--text-primary); font-size: 12px;
+            cursor: pointer; outline: none; font-family: inherit;
+        }
+        .review-card .status-select:focus { border-color: var(--accent-gold); }
+        .review-card .delete-btn {
+            padding: 4px 12px; border-radius: 6px; border: none;
+            font-size: 11px; font-weight: 600; background: rgba(239,68,68,0.08);
+            color: var(--danger); cursor: pointer; transition: 0.3s ease;
+        }
+        .review-card .delete-btn:hover { background: rgba(239,68,68,0.2); }
+
+        .empty-state { text-align: center; padding: 40px 20px; color: var(--text-secondary); grid-column: 1 / -1; }
+        .empty-state .icon { font-size: 48px; margin-bottom: 12px; }
+        .empty-state h3 { font-size: 18px; font-weight: 600; color: var(--text-primary); margin-bottom: 4px; }
+
+        .toast {
+            position: fixed; bottom: 24px; right: 24px; padding: 14px 24px;
+            background: var(--bg-card); border: 1px solid var(--border-color);
+            border-radius: 12px; color: var(--text-primary); font-size: 14px; font-weight: 500;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.5); z-index: 2000;
+            transform: translateY(100px); opacity: 0; transition: all 0.4s ease; max-width: 360px;
+        }
+        .toast.visible { transform: translateY(0); opacity: 1; }
+        .toast.success { border-color: var(--success); border-left: 4px solid var(--success); }
+        .toast.error { border-color: var(--danger); border-left: 4px solid var(--danger); }
+        .toast.info { border-color: var(--accent-gold); border-left: 4px solid var(--accent-gold); }
+
+        .footer { margin-top: 32px; padding-top: 16px; border-top: 1px solid var(--border-color); text-align: center; font-size: 11px; color: var(--text-secondary); }
+
+        @media (max-width: 768px) {
+            .stats { grid-template-columns: 1fr 1fr; }
+            .review-card .top-row { flex-direction: column; align-items: flex-start; }
+            .review-card .bottom-row { flex-direction: column; align-items: stretch; }
+            .admin-toolbar { flex-direction: column; align-items: stretch; }
+            .admin-toolbar .search-box { max-width: 100%; }
+            .admin-toolbar .actions { justify-content: stretch; }
+            .admin-toolbar .btn { flex: 1; text-align: center; justify-content: center; }
+        }
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: var(--bg-primary); }
+        ::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--accent-gold); }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+
+        <header class="header">
+            <div class="logo" onclick="window.location.reload()">
+                <div class="logo-icon">TS</div>
+                <div class="logo-text">Tradesphere<span>Hub</span></div>
+            </div>
+            <nav class="nav">
+                <a href="index.html">🏠 Home</a>
+                <a class="active" href="#">📝 Feedback & Reviews</a>
+            </nav>
+        </header>
+
+        <section class="hero">
+            <h1>📝 Feedback & Reviews</h1>
+            <p id="heroSub">Manage client reviews and feature requests.</p>
+        </section>
+
+        <!-- ===== ADMIN AUTH ===== -->
+        <div id="authScreen">
+            <h2>🔐 Admin Access</h2>
+            <p>Enter your admin password to manage feedback.</p>
+            <input type="password" id="adminPassword" placeholder="Enter admin password..." autofocus />
+            <button class="auth-btn" id="adminLoginBtn">Access Feedback</button>
+            <div class="auth-error" id="adminAuthError">Incorrect password. Please try again.</div>
+            <a href="index.html" class="back-link">← Back to Dashboard</a>
+        </div>
+
+        <!-- ===== ADMIN DASHBOARD ===== -->
+        <div id="adminDashboard">
+
+            <div class="stats" id="statsBar">
+                <div class="stat-card"><div class="number" id="totalReviews">0</div><div class="label">Total Reviews</div></div>
+                <div class="stat-card"><div class="number" id="pendingReviews">0</div><div class="label">Pending</div></div>
+                <div class="stat-card"><div class="number" id="implementedReviews">0</div><div class="label">Implemented</div></div>
+                <div class="stat-card"><div class="number" id="totalFeatures">0</div><div class="label">Feature Requests</div></div>
+            </div>
+
+            <div class="admin-tabs">
+                <button class="tab active" data-tab="reviews">📝 Reviews</button>
+                <button class="tab" data-tab="features">💡 Feature Requests</button>
+            </div>
+
+            <div class="admin-toolbar">
+                <div class="search-box">
+                    <span class="icon">🔍</span>
+                    <input type="text" id="searchInput" placeholder="Search by name or email..." />
+                </div>
+                <div class="actions">
+                    <button class="btn btn-primary" id="copyReviewLinkBtn">📋 Copy Review Link</button>
+                    <button class="btn btn-secondary" id="exportBtn">📤 Export CSV</button>
+                </div>
+            </div>
+
+            <div class="review-grid" id="reviewGrid"></div>
+        </div>
+
+        <div class="toast" id="toast"></div>
+
+        <div class="footer">
+            <p>© 2026 Tradesphere Hub · Feedback & Reviews · v1.1</p>
+        </div>
+
+    </div>
+
+    <script>
+        (function() {
+            'use strict';
+
+            // ---------- CONFIG ----------
+            const ADMIN_PASSWORD = 'admindelight200515$$';
+            const STORAGE_KEY = 'tradesphere_reviews';
+            const NOTIFICATION_KEY = 'tradesphere_notifications';
+
+            // ---------- STATE ----------
+            let reviews = [];
+            let isAuthenticated = false;
+            let currentTab = 'reviews';
+            let searchQuery = '';
+
+            // ---------- DOM REFS ----------
+            const authScreen = document.getElementById('authScreen');
+            const adminDashboard = document.getElementById('adminDashboard');
+            const adminPassword = document.getElementById('adminPassword');
+            const adminLoginBtn = document.getElementById('adminLoginBtn');
+            const adminAuthError = document.getElementById('adminAuthError');
+            const heroSub = document.getElementById('heroSub');
+
+            const tabs = document.querySelectorAll('.tab');
+            const searchInput = document.getElementById('searchInput');
+            const exportBtn = document.getElementById('exportBtn');
+            const copyReviewLinkBtn = document.getElementById('copyReviewLinkBtn');
+            const reviewGrid = document.getElementById('reviewGrid');
+
+            const totalReviews = document.getElementById('totalReviews');
+            const pendingReviews = document.getElementById('pendingReviews');
+            const implementedReviews = document.getElementById('implementedReviews');
+            const totalFeatures = document.getElementById('totalFeatures');
+
+            const toast = document.getElementById('toast');
+
+            // ---------- UTILITY ----------
+            function formatDate(ts) {
+                if (!ts) return 'N/A';
+                return new Date(ts).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+            }
+
+            function escapeHtml(text) {
+                if (!text) return '';
+                const div = document.createElement('div');
+                div.textContent = text;
+                return div.innerHTML;
+            }
+
+            function showToast(message, type) {
+                type = type || 'info';
+                toast.textContent = message;
+                toast.className = 'toast ' + type + ' visible';
+                clearTimeout(toast._timeout);
+                toast._timeout = setTimeout(function() { toast.classList.remove('visible'); }, 3000);
+            }
+
+            function getStatusLabel(status) {
+                const map = {
+                    'new': '🆕 New',
+                    'in_progress': '🔄 In Progress',
+                    'implemented': '✅ Implemented',
+                    'closed': '🔒 Closed',
+                    'declined': '❌ Declined'
+                };
+                return map[status] || status;
+            }
+
+            function getPublicLink() {
+                return window.location.origin + window.location.pathname.replace(/reviews\.html/, 'review-submit.html');
+            }
+
+            // ---------- STORAGE ----------
+            function loadReviews() {
+                try {
+                    const data = localStorage.getItem(STORAGE_KEY);
+                    if (data) { reviews = JSON.parse(data); } else { reviews = []; }
+                } catch (e) { reviews = []; }
+                return reviews;
+            }
+
+            function saveReviews() {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(reviews));
+            }
+
+            function pushNotification(msg, emoji) {
+                try {
+                    const notifs = JSON.parse(localStorage.getItem(NOTIFICATION_KEY) || '[]');
+                    notifs.unshift({ msg: msg, emoji: emoji || '📌', time: Date.now(), read: false, important: true });
+                    if (notifs.length > 50) notifs.length = 50;
+                    localStorage.setItem(NOTIFICATION_KEY, JSON.stringify(notifs));
+                } catch (e) { console.warn('Notif error', e); }
+            }
+
+            // ---------- ADMIN LOGIN ----------
+            function adminLogin() {
+                const pw = adminPassword.value.trim();
+                if (pw === ADMIN_PASSWORD) {
+                    isAuthenticated = true;
+                    authScreen.style.display = 'none';
+                    adminDashboard.style.display = 'block';
+                    adminAuthError.style.display = 'none';
+                    adminPassword.value = '';
+                    heroSub.textContent = 'Manage client feedback and feature requests.';
+                    renderDashboard();
+                    showToast('Welcome to Feedback & Reviews!', 'success');
+                } else {
+                    adminAuthError.style.display = 'block';
+                    setTimeout(function() { adminAuthError.style.display = 'none'; }, 3000);
+                }
+            }
+
+            // ---------- RENDER DASHBOARD ----------
+            function renderDashboard() {
+                loadReviews();
+
+                const allReviews = reviews.filter(r => r.type === 'review');
+                const allFeatures = reviews.filter(r => r.type === 'feature');
+
+                const pending = allReviews.filter(r => r.status === 'new' || r.status === 'in_progress').length;
+                const implemented = allReviews.filter(r => r.status === 'implemented').length;
+
+                totalReviews.textContent = allReviews.length;
+                pendingReviews.textContent = pending;
+                implementedReviews.textContent = implemented;
+                totalFeatures.textContent = allFeatures.length;
+
+                renderItems();
+            }
+
+            function renderItems() {
+                const isReviewTab = currentTab === 'reviews';
+                let filtered = reviews.filter(r => r.type === (isReviewTab ? 'review' : 'feature'));
+
+                const q = searchQuery.toLowerCase().trim();
+                if (q) {
+                    filtered = filtered.filter(r =>
+                        (r.clientName && r.clientName.toLowerCase().includes(q)) ||
+                        (r.clientEmail && r.clientEmail.toLowerCase().includes(q))
+                    );
+                }
+
+                // Sort by newest first
+                filtered.sort((a, b) => b.createdAt - a.createdAt);
+
+                if (filtered.length === 0) {
+                    reviewGrid.innerHTML = `
+                        <div class="empty-state">
+                            <div class="icon">${isReviewTab ? '📝' : '💡'}</div>
+                            <h3>${isReviewTab ? 'No reviews yet.' : 'No feature requests yet.'}</h3>
+                            <p>${isReviewTab ? 'Clients will appear here when they leave feedback.' : 'Clients will appear here when they request features.'}</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                let html = '';
+                for (let i = 0; i < filtered.length; i++) {
+                    const r = filtered[i];
+                    const statusOptions = isReviewTab ?
+                        ['new', 'in_progress', 'implemented', 'closed'] :
+                        ['new', 'in_progress', 'implemented', 'declined'];
+
+                    const ratingStars = r.rating ? '⭐'.repeat(r.rating) + '☆'.repeat(5 - r.rating) : '';
+                    const textClass = isReviewTab ? 'review-text' : 'feature-text';
+                    const textContent = isReviewTab ? r.review : r.request;
+
+                    html += `
+                        <div class="review-card">
+                            <div class="top-row">
+                                <div>
+                                    <div class="client-name">👤 ${escapeHtml(r.clientName || 'Anonymous')}</div>
+                                    <div class="client-email">📧 ${escapeHtml(r.clientEmail || 'No email')}</div>
+                                </div>
+                                <div>
+                                    ${r.rating ? `<div class="rating">${ratingStars}</div>` : ''}
+                                    <div class="meta">📅 ${formatDate(r.createdAt)}</div>
+                                </div>
+                            </div>
+                            ${textContent ? `<div class="${textClass}">${escapeHtml(textContent)}</div>` : ''}
+                            <div class="bottom-row">
+                                <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+                                    <span style="font-size:12px;color:var(--text-secondary);">Status:</span>
+                                    <select class="status-select" data-id="${r.id}">
+                                        ${statusOptions.map(s => `<option value="${s}" ${r.status === s ? 'selected' : ''}>${getStatusLabel(s)}</option>`).join('')}
+                                    </select>
+                                </div>
+                                <button class="delete-btn" data-id="${r.id}">🗑️ Delete</button>
+                            </div>
+                        </div>
+                    `;
+                }
+                reviewGrid.innerHTML = html;
+
+                // Status change events
+                document.querySelectorAll('.status-select').forEach(function(select) {
+                    select.addEventListener('change', function() {
+                        const id = this.dataset.id;
+                        const newStatus = this.value;
+                        updateStatus(id, newStatus);
+                    });
+                });
+
+                // Delete events
+                document.querySelectorAll('.delete-btn').forEach(function(btn) {
+                    btn.addEventListener('click', function() {
+                        const id = this.dataset.id;
+                        if (confirm('Delete this entry?')) {
+                            deleteItem(id);
+                        }
+                    });
+                });
+            }
+
+            // ---------- UPDATE STATUS ----------
+            function updateStatus(id, newStatus) {
+                loadReviews();
+                const item = reviews.find(r => r.id === id);
+                if (!item) { showToast('Item not found.', 'error'); return; }
+                item.status = newStatus;
+                saveReviews();
+                renderDashboard();
+                showToast('✅ Status updated to ' + getStatusLabel(newStatus), 'success');
+
+                if (newStatus === 'implemented') {
+                    const typeLabel = item.type === 'review' ? 'Review' : 'Feature request';
+                    pushNotification('📝 ' + typeLabel + ' from <strong>' + (item.clientName || 'Anonymous') +
+                        '</strong> marked as <span class="highlight">Implemented</span>', '✅');
+                }
+            }
+
+            // ---------- DELETE ITEM ----------
+            function deleteItem(id) {
+                loadReviews();
+                reviews = reviews.filter(r => r.id !== id);
+                saveReviews();
+                renderDashboard();
+                showToast('Entry deleted.', 'info');
+            }
+
+            // ---------- EXPORT CSV ----------
+            function exportCSV() {
+                loadReviews();
+                const isReviewTab = currentTab === 'reviews';
+                const filtered = reviews.filter(r => r.type === (isReviewTab ? 'review' : 'feature'));
+
+                if (filtered.length === 0) {
+                    showToast('No entries to export.', 'error');
+                    return;
+                }
+
+                let csv = isReviewTab ?
+                    'Client Name,Client Email,Rating,Review,Status,Date\n' :
+                    'Client Name,Client Email,Feature Request,Status,Date\n';
+
+                filtered.forEach(function(r) {
+                    if (isReviewTab) {
+                        csv += '"' + (r.clientName || '') + '","' + (r.clientEmail || '') + '",' + (r.rating || 0) +
+                            ',"' + (r.review || '').replace(/"/g, '""') + '","' + r.status + '","' + formatDate(r
+                                .createdAt) + '"\n';
+                    } else {
+                        csv += '"' + (r.clientName || '') + '","' + (r.clientEmail || '') + '","' + (r.request || '')
+                            .replace(/"/g, '""') + '","' + r.status + '","' + formatDate(r.createdAt) + '"\n';
+                    }
+                });
+
+                const blob = new Blob([csv], { type: 'text/csv' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = (isReviewTab ? 'reviews' : 'feature_requests') + '_' + new Date().toISOString().slice(0, 10) +
+                    '.csv';
+                a.click();
+                URL.revokeObjectURL(url);
+                showToast('📤 CSV exported!', 'success');
+            }
+
+            // ---------- COPY REVIEW LINK ----------
+            function copyReviewLink() {
+                const link = getPublicLink();
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    navigator.clipboard.writeText(link).then(function() {
+                        showToast('✅ Review link copied to clipboard!', 'success');
+                    }).catch(function() {
+                        fallbackCopy(link);
+                    });
+                } else {
+                    fallbackCopy(link);
+                }
+            }
+
+            function fallbackCopy(text) {
+                const textarea = document.createElement('textarea');
+                textarea.value = text;
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textarea);
+                showToast('✅ Review link copied to clipboard!', 'success');
+            }
+
+            // ---------- EVENT LISTENERS ----------
+            adminLoginBtn.addEventListener('click', adminLogin);
+            adminPassword.addEventListener('keydown', function(e) { if (e.key === 'Enter') adminLogin(); });
+
+            // Tabs
+            tabs.forEach(function(tab) {
+                tab.addEventListener('click', function() {
+                    tabs.forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    currentTab = this.dataset.tab;
+                    renderDashboard();
+                });
+            });
+
+            searchInput.addEventListener('input', function() {
+                searchQuery = this.value;
+                renderItems();
+            });
+
+            exportBtn.addEventListener('click', exportCSV);
+            copyReviewLinkBtn.addEventListener('click', copyReviewLink);
+
+            // ---------- INIT ----------
+            function init() {
+                loadReviews();
+                const adminParam = new URLSearchParams(window.location.search).get('admin');
+                if (adminParam === 'true') {
+                    authScreen.style.display = 'block';
+                    adminDashboard.style.display = 'none';
+                } else {
+                    window.location.href = 'index.html';
+                }
+            }
+
+            init();
+
+            console.log('📝 Feedback & Reviews v1.1 loaded');
+            console.log('📊 Reviews:', reviews.length);
+            console.log('🔑 Admin password: admindelight200515$$');
+
+        })();
+    </script>
+
+</body>
+</html>
