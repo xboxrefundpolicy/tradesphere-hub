@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>Submit Your Feedback – Tradesphere Hub</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+    <script data-goatcounter="https://tradespherehub.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        :root {
+            --bg-primary: #0A0A0A;
+            --bg-card: #141414;
+            --bg-input: #1E1E1E;
+            --border-color: #2A2A2A;
+            --text-primary: #FFFFFF;
+            --text-secondary: #A0A0A0;
+            --accent-gold: #F59E0B;
+            --accent-gold-hover: #D97706;
+            --radius: 16px;
+            --shadow: 0 8px 32px rgba(0,0,0,0.5);
+            --success: #10B981;
+            --danger: #EF4444;
+            --info: #3B82F6;
+        }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .container { max-width: 550px; width:100%; }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0 16px;
+            border-bottom: 1px solid var(--border-color);
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .logo { display: flex; align-items: center; gap: 10px; cursor: pointer; }
+        .logo-icon {
+            background: linear-gradient(135deg, var(--accent-gold), #FBBF24);
+            color: #000; width: 38px; height: 38px; border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 18px; font-weight: 800;
+        }
+        .logo-text { font-size: 20px; font-weight: 800; letter-spacing: -0.5px; }
+        .logo-text span { color: var(--accent-gold); }
+        .nav { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+        .nav a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 500;
+            padding: 6px 12px;
+            border-radius: 8px;
+            transition: 0.3s ease;
+        }
+        .nav a:hover { color: var(--text-primary); background: rgba(255,255,255,0.05); }
+        .nav a.active { color: var(--accent-gold); background: rgba(245,158,11,0.1); }
+
+        .hero { text-align: center; padding: 20px 0 10px; }
+        .hero h1 {
+            font-size: 28px; font-weight: 800;
+            background: linear-gradient(135deg, #fff 40%, var(--accent-gold));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+            letter-spacing: -1px;
+        }
+        .hero p { color: var(--text-secondary); font-size: 14px; max-width: 400px; margin: 6px auto 0; }
+
+        /* ===== FORM ===== */
+        .form-box {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            padding: 28px 24px;
+            box-shadow: var(--shadow);
+            margin: 16px 0 20px;
+        }
+        .form-box label {
+            display: block;
+            font-weight: 500;
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-bottom: 4px;
+        }
+        .form-box input, .form-box textarea, .form-box select {
+            width: 100%;
+            padding: 11px 14px;
+            background: var(--bg-input);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            color: var(--text-primary);
+            font-size: 14px;
+            margin-bottom: 14px;
+            transition: border 0.3s ease;
+            font-family: inherit;
+        }
+        .form-box input:focus, .form-box textarea:focus, .form-box select:focus {
+            outline: none;
+            border-color: var(--accent-gold);
+        }
+        .form-box textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+        .form-box .rating-group {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 14px;
+            flex-wrap: wrap;
+        }
+        .form-box .rating-group .star-btn {
+            font-size: 28px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--text-secondary);
+            transition: 0.2s;
+            padding: 0 2px;
+        }
+        .form-box .rating-group .star-btn:hover,
+        .form-box .rating-group .star-btn.active {
+            color: var(--accent-gold);
+            transform: scale(1.1);
+        }
+        .form-box .submit-btn {
+            width: 100%;
+            padding: 14px;
+            background: var(--accent-gold);
+            color: #000;
+            border: none;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 16px;
+            cursor: pointer;
+            transition: 0.3s ease;
+        }
+        .form-box .submit-btn:hover {
+            background: var(--accent-gold-hover);
+            transform: scale(1.01);
+        }
+        .form-box .error-msg {
+            color: var(--danger);
+            text-align: center;
+            font-size: 13px;
+            margin-top: 12px;
+            display: none;
+        }
+
+        /* ===== THANK YOU OVERLAY ===== */
+        .thank-you-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.85);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            backdrop-filter: blur(8px);
+            animation: fadeIn 0.5s ease;
+        }
+        .thank-you-overlay.active { display: flex; }
+        @keyframes fadeIn {
+            from { opacity:0; transform:scale(0.95); }
+            to { opacity:1; transform:scale(1); }
+        }
+
+        .thank-you-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            padding: 40px 32px;
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+            box-shadow: var(--shadow);
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        .thank-you-card .icon { font-size: 64px; margin-bottom: 12px; display: block; }
+        .thank-you-card h2 {
+            font-size: 28px;
+            font-weight: 800;
+            margin-bottom: 4px;
+            background: linear-gradient(135deg, #fff 40%, var(--accent-gold));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .thank-you-card .sub {
+            color: var(--text-secondary);
+            font-size: 14px;
+            margin-bottom: 16px;
+        }
+        .thank-you-card .preview-box {
+            background: var(--bg-input);
+            border-radius: 12px;
+            padding: 16px;
+            margin: 16px 0;
+            text-align: left;
+            border-left: 3px solid var(--accent-gold);
+        }
+        .thank-you-card .preview-box .rating {
+            color: var(--accent-gold);
+            font-size: 20px;
+            letter-spacing: 2px;
+            margin-bottom: 4px;
+        }
+        .thank-you-card .preview-box .review-text {
+            color: var(--text-secondary);
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        .thank-you-card .preview-box .feature-text {
+            color: var(--info);
+            font-size: 13px;
+            margin-top: 6px;
+            padding-top: 6px;
+            border-top: 1px solid var(--border-color);
+        }
+        .thank-you-card .close-timer {
+            color: var(--text-secondary);
+            font-size: 13px;
+            margin: 12px 0 16px;
+        }
+        .thank-you-card .close-timer strong { color: var(--accent-gold); }
+        .thank-you-card .close-btn {
+            padding: 12px 32px;
+            background: var(--accent-gold);
+            color: #000;
+            border: none;
+            border-radius: 40px;
+            font-weight: 700;
+            font-size: 15px;
+            cursor: pointer;
+            transition: 0.3s ease;
+            font-family: inherit;
+        }
+        .thank-you-card .close-btn:hover {
+            background: var(--accent-gold-hover);
+            transform: scale(1.02);
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            padding: 14px 24px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            color: var(--text-primary);
+            font-size: 14px;
+            font-weight: 500;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+            z-index: 2000;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.4s ease;
+            max-width: 360px;
+        }
+        .toast.visible { transform: translateY(0); opacity: 1; }
+        .toast.success { border-color: var(--success); border-left: 4px solid var(--success); }
+        .toast.error { border-color: var(--danger); border-left: 4px solid var(--danger); }
+        .toast.info { border-color: var(--accent-gold); border-left: 4px solid var(--accent-gold); }
+
+        .footer { margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border-color); text-align: center; font-size: 11px; color: var(--text-secondary); }
+
+        .hidden { display: none !important; }
+
+        @media (max-width: 480px) {
+            .form-box { padding: 20px 16px; }
+            .form-box .rating-group .star-btn { font-size: 24px; }
+            .thank-you-card { padding: 28px 20px; }
+            .thank-you-card h2 { font-size: 24px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+
+        <header class="header">
+            <div class="logo" onclick="window.location.reload()">
+                <div class="logo-icon">TS</div>
+                <div class="logo-text">Tradesphere<span>Hub</span></div>
+            </div>
+            <nav class="nav">
+                <a href="index.html">🏠 Home</a>
+                <a class="active" href="#">📝 Leave Feedback</a>
+            </nav>
+        </header>
+
+        <section class="hero">
+            <h1>📝 Share Your Feedback</h1>
+            <p>Help us improve Tradesphere Hub – share your experience and feature requests.</p>
+        </section>
+
+        <!-- ===== FORM ===== -->
+        <div class="form-box" id="formBox">
+            <label>Your Name *</label>
+            <input type="text" id="clientName" placeholder="Enter your name..." />
+
+            <label>Your Email</label>
+            <input type="email" id="clientEmail" placeholder="Enter your email (optional)..." />
+
+            <label>How would you rate your experience?</label>
+            <div class="rating-group" id="ratingGroup">
+                <button class="star-btn" data-star="1">☆</button>
+                <button class="star-btn" data-star="2">☆</button>
+                <button class="star-btn" data-star="3">☆</button>
+                <button class="star-btn" data-star="4">☆</button>
+                <button class="star-btn" data-star="5">☆</button>
+            </div>
+
+            <label>Your Review *</label>
+            <textarea id="reviewText" placeholder="Share your experience with Tradesphere Hub..."></textarea>
+
+            <label>Feature Request (optional)</label>
+            <textarea id="featureRequest" placeholder="What feature would you like to see added?"></textarea>
+
+            <button class="submit-btn" id="submitBtn">📤 Submit Feedback</button>
+            <div class="error-msg" id="errorMsg">⚠️ Please enter your name and a review.</div>
+        </div>
+
+        <!-- ===== THANK YOU OVERLAY ===== -->
+        <div class="thank-you-overlay" id="thankYouOverlay">
+            <div class="thank-you-card">
+                <span class="icon">✅</span>
+                <h2 id="thankYouName">Thank You!</h2>
+                <div class="sub">Your feedback has been submitted successfully.</div>
+                <div class="preview-box">
+                    <div class="rating" id="previewRating">⭐⭐⭐⭐☆</div>
+                    <div class="review-text" id="previewReview">"Your review will appear here."</div>
+                    <div class="feature-text" id="previewFeature"></div>
+                </div>
+                <div class="close-timer">⏳ This page will close in <strong id="countdownTimer">5</strong> seconds...</div>
+                <button class="close-btn" id="closeThankYouBtn">✕ Close</button>
+            </div>
+        </div>
+
+        <div class="toast" id="toast"></div>
+
+        <div class="footer">
+            <p>© 2026 Tradesphere Hub · Feedback & Reviews</p>
+        </div>
+
+    </div>
+
+    <script>
+        (function() {
+            'use strict';
+
+            // ---------- DOM REFS ----------
+            const clientName = document.getElementById('clientName');
+            const clientEmail = document.getElementById('clientEmail');
+            const reviewText = document.getElementById('reviewText');
+            const featureRequest = document.getElementById('featureRequest');
+            const submitBtn = document.getElementById('submitBtn');
+            const errorMsg = document.getElementById('errorMsg');
+            const starBtns = document.querySelectorAll('.star-btn');
+            const formBox = document.getElementById('formBox');
+            const thankYouOverlay = document.getElementById('thankYouOverlay');
+            const thankYouName = document.getElementById('thankYouName');
+            const previewRating = document.getElementById('previewRating');
+            const previewReview = document.getElementById('previewReview');
+            const previewFeature = document.getElementById('previewFeature');
+            const countdownTimer = document.getElementById('countdownTimer');
+            const closeThankYouBtn = document.getElementById('closeThankYouBtn');
+
+            const toast = document.getElementById('toast');
+            let selectedRating = 0;
+            let countdownInterval = null;
+
+            // ---------- RATING ----------
+            starBtns.forEach(function(btn) {
+                btn.addEventListener('click', function() {
+                    const star = parseInt(this.dataset.star);
+                    selectedRating = star;
+                    starBtns.forEach(function(b) {
+                        const s = parseInt(b.dataset.star);
+                        if (s <= star) {
+                            b.textContent = '⭐';
+                            b.classList.add('active');
+                        } else {
+                            b.textContent = '☆';
+                            b.classList.remove('active');
+                        }
+                    });
+                });
+            });
+
+            // ---------- TOAST ----------
+            function showToast(msg, type) {
+                type = type || 'info';
+                toast.textContent = msg;
+                toast.className = 'toast ' + type + ' visible';
+                clearTimeout(toast._timeout);
+                toast._timeout = setTimeout(function() {
+                    toast.classList.remove('visible');
+                }, 3000);
+            }
+
+            // ---------- CLOSE PAGE ----------
+            function closePage() {
+                window.close();
+                // Fallback: if window.close() fails (some browsers block it),
+                // redirect to a blank page or show a message
+                document.body.innerHTML = `
+                    <div style="text-align:center;padding:60px 20px;color:var(--text-secondary);">
+                        <div style="font-size:48px;margin-bottom:12px;">👋</div>
+                        <h3 style="color:var(--text-primary);font-size:20px;">Thanks for your feedback!</h3>
+                        <p>You can close this tab now.</p>
+                    </div>
+                `;
+            }
+
+            // ---------- START COUNTDOWN ----------
+            function startCountdown() {
+                let seconds = 5;
+                countdownTimer.textContent = seconds;
+                clearInterval(countdownInterval);
+                countdownInterval = setInterval(function() {
+                    seconds--;
+                    countdownTimer.textContent = seconds;
+                    if (seconds <= 0) {
+                        clearInterval(countdownInterval);
+                        closePage();
+                    }
+                }, 1000);
+            }
+
+            // ---------- SHOW THANK YOU ----------
+            function showThankYou(name, rating, review, feature) {
+                // Update content
+                thankYouName.textContent = 'Thank You, ' + name + '!';
+                const stars = '⭐'.repeat(rating) + '☆'.repeat(5 - rating);
+                previewRating.textContent = stars;
+                previewReview.textContent = '"' + review + '"';
+                if (feature && feature.trim()) {
+                    previewFeature.textContent = '💡 Feature Request: "' + feature + '"';
+                    previewFeature.style.display = 'block';
+                } else {
+                    previewFeature.style.display = 'none';
+                }
+
+                // Hide form, show overlay
+                formBox.style.display = 'none';
+                thankYouOverlay.classList.add('active');
+
+                // Start countdown
+                startCountdown();
+            }
+
+            // ---------- SUBMIT ----------
+            submitBtn.addEventListener('click', function() {
+                const name = clientName.value.trim();
+                const email = clientEmail.value.trim();
+                const review = reviewText.value.trim();
+                const feature = featureRequest.value.trim();
+
+                if (!name) {
+                    errorMsg.textContent = '⚠️ Please enter your name.';
+                    errorMsg.style.display = 'block';
+                    setTimeout(function() { errorMsg.style.display = 'none'; }, 3000);
+                    return;
+                }
+                if (!review) {
+                    errorMsg.textContent = '⚠️ Please share your review.';
+                    errorMsg.style.display = 'block';
+                    setTimeout(function() { errorMsg.style.display = 'none'; }, 3000);
+                    return;
+                }
+
+                // Save to localStorage
+                const reviews = JSON.parse(localStorage.getItem('tradesphere_reviews') || '[]');
+
+                const newReview = {
+                    id: Date.now().toString(36) + Math.random().toString(36).slice(2, 7),
+                    type: 'review',
+                    clientName: name,
+                    clientEmail: email || '',
+                    rating: selectedRating || 0,
+                    review: review,
+                    feature: feature || '',
+                    request: feature || '',
+                    status: 'new',
+                    createdAt: Date.now()
+                };
+
+                reviews.push(newReview);
+
+                if (feature) {
+                    const featureEntry = {
+                        id: Date.now().toString(36) + Math.random().toString(36).slice(2, 7),
+                        type: 'feature',
+                        clientName: name,
+                        clientEmail: email || '',
+                        rating: selectedRating || 0,
+                        review: review,
+                        feature: feature,
+                        request: feature,
+                        status: 'new',
+                        createdAt: Date.now() + 1
+                    };
+                    reviews.push(featureEntry);
+                }
+
+                localStorage.setItem('tradesphere_reviews', JSON.stringify(reviews));
+
+                // Push notification
+                const notifs = JSON.parse(localStorage.getItem('tradesphere_notifications') || '[]');
+                notifs.unshift({
+                    msg: '📝 New review from <strong>' + name + '</strong>' + (feature ? ' (with feature request)' : ''),
+                    emoji: '📝',
+                    time: Date.now(),
+                    read: false,
+                    important: true
+                });
+                if (notifs.length > 50) notifs.length = 50;
+                localStorage.setItem('tradesphere_notifications', JSON.stringify(notifs));
+
+                // Show thank you overlay
+                showThankYou(name, selectedRating || 0, review, feature);
+            });
+
+            // ---------- CLOSE BUTTON ----------
+            closeThankYouBtn.addEventListener('click', function() {
+                clearInterval(countdownInterval);
+                closePage();
+            });
+
+            // ---------- KEYBOARD: ESCAPE CLOSES ----------
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape' && thankYouOverlay.classList.contains('active')) {
+                    clearInterval(countdownInterval);
+                    closePage();
+                }
+            });
+
+            // ---------- INIT ----------
+            console.log('📝 Review Submit Form v2.0 loaded');
+
+        })();
+    </script>
+
+</body>
+</html>
