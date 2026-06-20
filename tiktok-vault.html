@@ -1,0 +1,2491 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>Social Vault – Premium Manager</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        :root {
+            --bg-primary: #0B0B0B;
+            --bg-card: #141414;
+            --bg-input: #1E1E1E;
+            --border-color: #2A2A2A;
+            --text-primary: #FFFFFF;
+            --text-secondary: #A0A0A0;
+            --accent-gold: #F59E0B;
+            --accent-gold-hover: #D97706;
+            --radius: 16px;
+            --shadow: 0 8px 32px rgba(0,0,0,0.6);
+            --success: #10B981;
+            --danger: #EF4444;
+            --warning: #F59E0B;
+            --info: #3B82F6;
+        }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .container { max-width: 1200px; width:100%; }
+
+        /* ===== HEADER ===== */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0 16px;
+            border-bottom: 1px solid var(--border-color);
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+        }
+        .logo .icon {
+            background: linear-gradient(135deg, var(--accent-gold), #FBBF24);
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            font-weight: 800;
+            color: #000;
+        }
+        .logo h1 {
+            font-size: 22px;
+            font-weight: 800;
+        }
+        .logo h1 span { color: var(--accent-gold); }
+        .header-actions {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .header-actions .lock-badge {
+            background: rgba(245,158,11,0.12);
+            border: 1px solid var(--accent-gold);
+            color: var(--accent-gold);
+            padding: 6px 16px;
+            border-radius: 40px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .header-actions .lock-badge:hover {
+            background: rgba(245,158,11,0.25);
+        }
+        .header-actions .settings-btn {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            padding: 6px 16px;
+            border-radius: 40px;
+            font-size: 18px;
+            cursor: pointer;
+            transition: 0.3s;
+            line-height: 1;
+        }
+        .header-actions .settings-btn:hover {
+            border-color: var(--accent-gold);
+            color: var(--accent-gold);
+        }
+
+        /* ===== LOCK OVERLAY ===== */
+        #vaultWrapper {
+            position: relative;
+            border-radius: var(--radius);
+            overflow: hidden;
+            transition: all 0.4s;
+        }
+        #vaultContent {
+            transition: all 0.4s;
+        }
+        #vaultContent.locked {
+            filter: blur(8px);
+            pointer-events: none;
+            user-select: none;
+            opacity: 0.4;
+            min-height: 400px;
+        }
+        #vaultContent.unlocked {
+            filter: blur(0);
+            pointer-events: auto;
+            user-select: auto;
+            opacity: 1;
+        }
+        .lock-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: rgba(0,0,0,0.75);
+            backdrop-filter: blur(8px);
+            z-index: 10;
+            border-radius: var(--radius);
+            padding: 20px;
+            text-align: center;
+        }
+        .lock-overlay.active {
+            display: flex;
+        }
+        .lock-overlay .lock-icon {
+            font-size: 60px;
+            margin-bottom: 16px;
+            background: rgba(245,158,11,0.15);
+            padding: 20px;
+            border-radius: 50%;
+            border: 2px solid var(--accent-gold);
+        }
+        .lock-overlay h2 {
+            font-size: 26px;
+            font-weight: 700;
+            margin-bottom: 6px;
+            color: #fff;
+        }
+        .lock-overlay p {
+            color: var(--text-secondary);
+            font-size: 15px;
+            margin-bottom: 20px;
+            max-width: 340px;
+        }
+        .lock-overlay .lock-input {
+            background: var(--bg-input);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 14px 18px;
+            width: 280px;
+            max-width: 100%;
+            color: #fff;
+            font-size: 15px;
+            outline: none;
+            transition: border 0.3s;
+        }
+        .lock-overlay .lock-input:focus {
+            border-color: var(--accent-gold);
+        }
+        .lock-overlay .lock-btn {
+            margin-top: 12px;
+            background: var(--accent-gold);
+            color: #000;
+            border: none;
+            padding: 12px 32px;
+            border-radius: 40px;
+            font-weight: 700;
+            font-size: 16px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .lock-overlay .lock-btn:hover {
+            background: var(--accent-gold-hover);
+            transform: scale(1.02);
+        }
+        .lock-overlay .lock-error {
+            color: var(--danger);
+            font-size: 13px;
+            margin-top: 10px;
+            display: none;
+        }
+
+        /* ===== STATS ===== */
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+            gap: 12px;
+            margin: 20px 0 18px;
+        }
+        .stat-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 14px;
+            text-align: center;
+            transition: border 0.3s;
+        }
+        .stat-card:hover { border-color: var(--accent-gold); }
+        .stat-card .number {
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--accent-gold);
+        }
+        .stat-card .label {
+            font-size: 11px;
+            color: var(--text-secondary);
+            margin-top: 2px;
+        }
+        .stat-card .trend {
+            font-size: 11px;
+            font-weight: 600;
+        }
+        .stat-card .trend.up { color: var(--success); }
+        .stat-card .trend.down { color: var(--danger); }
+
+        /* ===== PLATFORM STATS (second row) ===== */
+        .platform-stats {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 18px;
+        }
+        .platform-stat {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 30px;
+            padding: 4px 14px;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: border 0.3s;
+            cursor: default;
+        }
+        .platform-stat:hover {
+            border-color: var(--accent-gold);
+        }
+        .platform-stat .count {
+            color: var(--accent-gold);
+            font-weight: 800;
+        }
+
+        /* ===== TOOLBAR ===== */
+        .toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            align-items: center;
+            margin-bottom: 18px;
+        }
+        .toolbar .search {
+            flex: 1;
+            min-width: 200px;
+            background: var(--bg-input);
+            border: 1px solid var(--border-color);
+            border-radius: 40px;
+            padding: 8px 18px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .toolbar .search input {
+            background: transparent;
+            border: none;
+            color: #fff;
+            font-size: 14px;
+            width: 100%;
+            outline: none;
+        }
+        .toolbar .search input::placeholder { color: #666; }
+        .toolbar .filters {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+        .toolbar .filters select {
+            background: var(--bg-input);
+            border: 1px solid var(--border-color);
+            border-radius: 40px;
+            padding: 8px 16px;
+            color: #fff;
+            font-size: 12px;
+            cursor: pointer;
+            outline: none;
+        }
+        .toolbar .filters select:focus { border-color: var(--accent-gold); }
+        .toolbar .add-btn {
+            background: var(--accent-gold);
+            color: #000;
+            border: none;
+            padding: 8px 24px;
+            border-radius: 40px;
+            font-weight: 700;
+            font-size: 14px;
+            cursor: pointer;
+            transition: 0.3s;
+            white-space: nowrap;
+        }
+        .toolbar .add-btn:hover {
+            background: var(--accent-gold-hover);
+            transform: scale(1.02);
+        }
+
+        /* ===== ACCOUNT LIST ===== */
+        .account-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .account-row {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 12px 18px;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            transition: border 0.3s;
+        }
+        .account-row:hover { border-color: var(--accent-gold); }
+        .account-row .col-check { width: 30px; }
+        .account-row .col-check input[type="checkbox"] {
+            accent-color: var(--accent-gold);
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+        }
+        .account-row .col-info {
+            flex: 2;
+            min-width: 160px;
+        }
+        .account-row .col-info .username {
+            font-weight: 600;
+            font-size: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .account-row .col-info .username .email {
+            font-weight: 400;
+            font-size: 13px;
+            color: #666;
+        }
+        .account-row .col-info .meta {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: 2px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            align-items: center;
+        }
+        .badge {
+            display: inline-block;
+            padding: 2px 10px;
+            border-radius: 20px;
+            font-size: 10px;
+            font-weight: 600;
+        }
+        .badge.active { background: rgba(16,185,129,0.15); color: var(--success); }
+        .badge.suspended { background: rgba(245,158,11,0.15); color: var(--warning); }
+        .badge.banned { background: rgba(239,68,68,0.15); color: var(--danger); }
+        .badge.inactive { background: rgba(160,160,160,0.15); color: var(--text-secondary); }
+        .badge.verified { background: rgba(59,130,246,0.15); color: var(--info); }
+        .tag {
+            display: inline-block;
+            padding: 1px 8px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: 500;
+            background: rgba(245,158,11,0.12);
+            color: var(--accent-gold);
+            border: 1px solid rgba(245,158,11,0.2);
+        }
+        .platform-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+        .platform-badge.tiktok { background: rgba(0,0,0,0.3); color: #fff; }
+        .platform-badge.facebook { background: rgba(24,119,242,0.2); color: #1877F2; }
+        .platform-badge.snapchat { background: rgba(255,252,0,0.15); color: #FFFC00; }
+        .platform-badge.instagram { background: rgba(225,48,108,0.2); color: #E1306C; }
+        .platform-badge.youtube { background: rgba(255,0,0,0.2); color: #FF0000; }
+        .platform-badge.twitter { background: rgba(29,161,242,0.2); color: #1DA1F2; }
+        .platform-badge.custom { background: rgba(160,160,160,0.2); color: #A0A0A0; }
+
+        .account-row .col-followers {
+            font-weight: 700;
+            font-size: 14px;
+            color: var(--accent-gold);
+            min-width: 70px;
+        }
+        .account-row .col-followers .change {
+            font-size: 11px;
+            font-weight: 600;
+        }
+        .account-row .col-followers .change.up { color: var(--success); }
+        .account-row .col-followers .change.down { color: var(--danger); }
+        .account-row .col-actions {
+            display: flex;
+            gap: 4px;
+        }
+        .account-row .col-actions button {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .account-row .col-actions button:hover {
+            border-color: var(--accent-gold);
+            color: #fff;
+        }
+        .account-row .col-actions button.danger:hover {
+            border-color: var(--danger);
+            color: var(--danger);
+        }
+        .account-row .col-actions button.primary:hover {
+            border-color: var(--info);
+            color: var(--info);
+        }
+        .account-row .col-actions button img-preview {
+            cursor: pointer;
+        }
+        .account-row .thumbnail {
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            object-fit: cover;
+            background: var(--bg-input);
+            border: 1px solid var(--border-color);
+        }
+        .account-row .no-thumb {
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            background: var(--bg-input);
+            border: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        /* ===== BULK BAR ===== */
+        .bulk-bar {
+            margin-top: 16px;
+            padding: 12px 0;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+        }
+        .bulk-bar .info {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+        .bulk-bar .bulk-btn {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            padding: 6px 18px;
+            border-radius: 40px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .bulk-bar .bulk-btn:hover {
+            border-color: var(--accent-gold);
+            color: #fff;
+        }
+        .bulk-bar .bulk-btn.danger:hover {
+            border-color: var(--danger);
+            color: var(--danger);
+        }
+        .bulk-bar .bulk-btn.success:hover {
+            border-color: var(--success);
+            color: var(--success);
+        }
+
+        /* ===== ACTIVITY LOG ===== */
+        .activity-preview {
+            margin-top: 18px;
+            padding-top: 16px;
+            border-top: 1px solid var(--border-color);
+        }
+        .activity-preview .title {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+        .activity-preview .log-item {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: #888;
+            padding: 4px 0;
+            border-bottom: 1px solid #1A1A1A;
+        }
+        .activity-preview .log-item .time { color: #555; }
+        .activity-preview .log-item .action { color: var(--accent-gold); }
+
+        /* ===== MODALS ===== */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.85);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            backdrop-filter: blur(4px);
+            animation: fadeIn 0.3s ease;
+        }
+        .modal-overlay.active { display: flex; }
+        @keyframes fadeIn {
+            from { opacity:0; transform:scale(0.95); }
+            to { opacity:1; transform:scale(1); }
+        }
+        .modal {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            max-width: 580px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 28px 24px;
+            box-shadow: var(--shadow);
+        }
+        .modal h2 {
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+        .modal .sub {
+            color: var(--text-secondary);
+            font-size: 13px;
+            margin-bottom: 16px;
+        }
+        .modal label {
+            display: block;
+            font-weight: 500;
+            font-size: 13px;
+            margin-bottom: 4px;
+            color: var(--text-secondary);
+        }
+        .modal input, .modal textarea, .modal select {
+            width: 100%;
+            padding: 10px 14px;
+            background: var(--bg-input);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            color: #fff;
+            font-size: 14px;
+            margin-bottom: 14px;
+            transition: border 0.3s;
+            font-family: inherit;
+        }
+        .modal input:focus, .modal textarea:focus, .modal select:focus {
+            outline: none;
+            border-color: var(--accent-gold);
+        }
+        .modal textarea { min-height: 60px; resize: vertical; }
+        .modal .row {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .modal .row .half { flex: 1; min-width: 140px; }
+        .modal .btn-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 4px;
+        }
+        .modal .btn-group .submit-btn {
+            flex: 1;
+            padding: 12px;
+            background: var(--accent-gold);
+            color: #000;
+            border: none;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 14px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .modal .btn-group .submit-btn:hover {
+            background: var(--accent-gold-hover);
+        }
+        .modal .btn-group .cancel-btn {
+            padding: 12px 20px;
+            background: rgba(255,255,255,0.06);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .modal .btn-group .cancel-btn:hover {
+            background: rgba(255,255,255,0.1);
+        }
+        .modal .helper-btn {
+            background: rgba(245,158,11,0.08);
+            border: 1px solid rgba(245,158,11,0.2);
+            color: var(--accent-gold);
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .modal .helper-btn:hover {
+            background: rgba(245,158,11,0.15);
+        }
+        .modal .tag-input-area {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .modal .tag-input-area .tag-item {
+            background: rgba(245,158,11,0.12);
+            border: 1px solid rgba(245,158,11,0.2);
+            border-radius: 20px;
+            padding: 2px 10px;
+            font-size: 12px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            color: var(--accent-gold);
+        }
+        .modal .tag-input-area .tag-item .remove-tag {
+            cursor: pointer;
+            font-weight: 700;
+            color: var(--danger);
+        }
+        .modal .tag-input-area .tag-item .remove-tag:hover {
+            color: #ff6b6b;
+        }
+        .modal .file-upload-area {
+            border: 1px dashed var(--border-color);
+            border-radius: 10px;
+            padding: 12px;
+            text-align: center;
+            margin-bottom: 14px;
+            transition: border 0.3s;
+            cursor: pointer;
+        }
+        .modal .file-upload-area:hover {
+            border-color: var(--accent-gold);
+        }
+        .modal .file-upload-area input[type="file"] {
+            display: none;
+        }
+        .modal .file-upload-area .preview-thumb {
+            max-width: 100px;
+            max-height: 100px;
+            border-radius: 8px;
+            margin-top: 8px;
+        }
+        .modal .image-url-area {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+        .modal .image-url-area input {
+            flex: 1;
+            margin-bottom: 0;
+        }
+
+        /* Settings modal */
+        .settings-modal .modal { max-width: 480px; }
+
+        /* Details modal */
+        .details-modal .modal { max-width: 600px; }
+        .details-modal .details-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px 20px;
+            margin: 12px 0;
+        }
+        .details-modal .details-grid .item {
+            font-size: 14px;
+            padding: 4px 0;
+            border-bottom: 1px solid #1A1A1A;
+        }
+        .details-modal .details-grid .item .label {
+            font-weight: 600;
+            color: var(--text-secondary);
+            font-size: 12px;
+        }
+        .details-modal .details-grid .item .value {
+            color: #fff;
+        }
+        .details-modal .details-grid .full {
+            grid-column: 1 / -1;
+        }
+        .details-modal .thumbnail-large {
+            max-width: 100%;
+            max-height: 200px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            margin-top: 8px;
+        }
+
+        /* ===== TOAST ===== */
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            padding: 14px 24px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            color: var(--text-primary);
+            font-size: 14px;
+            font-weight: 500;
+            box-shadow: var(--shadow);
+            z-index: 2000;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.4s ease;
+            max-width: 360px;
+        }
+        .toast.visible {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        .toast.success { border-color: var(--success); border-left: 4px solid var(--success); }
+        .toast.error { border-color: var(--danger); border-left: 4px solid var(--danger); }
+        .toast.info { border-color: var(--accent-gold); border-left: 4px solid var(--accent-gold); }
+
+        /* ===== FOOTER ===== */
+        .footer {
+            margin-top: 20px;
+            font-size: 11px;
+            color: #555;
+            text-align: center;
+            border-top: 1px solid var(--border-color);
+            padding-top: 14px;
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .footer .secure { color: var(--success); }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            body { padding: 12px; }
+            .container { padding: 0; }
+            .stats { grid-template-columns: 1fr 1fr; }
+            .account-row { flex-direction: column; align-items: stretch; }
+            .account-row .col-followers { text-align: left; }
+            .account-row .col-actions { justify-content: flex-start; }
+            .toolbar .search { flex: 1 1 100%; }
+            .modal { padding: 20px 16px; }
+            .details-modal .details-grid { grid-template-columns: 1fr; }
+            .platform-stats { justify-content: center; }
+            .lock-overlay .lock-input { width: 100%; }
+        }
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: var(--bg-primary); }
+        ::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--accent-gold); }
+    </style>
+</head>
+<body>
+<div class="container">
+
+    <!-- ===== HEADER ===== -->
+    <header class="header">
+        <div class="logo" onclick="location.reload()">
+            <div class="icon">🔐</div>
+            <h1>Social <span>Vault</span></h1>
+        </div>
+        <div class="header-actions">
+            <span class="lock-badge" id="lockToggleBtn">🔒 Lock</span>
+            <button class="settings-btn" id="openSettingsBtn" title="Settings">⚙️</button>
+            <button class="settings-btn" id="openBackupBtn" title="Backup">💾</button>
+        </div>
+    </header>
+
+    <!-- ===== VAULT WRAPPER ===== -->
+    <div id="vaultWrapper">
+        <!-- Lock Overlay -->
+        <div class="lock-overlay active" id="lockOverlay">
+            <div class="lock-icon">🔒</div>
+            <h2>Vault Locked</h2>
+            <p>Enter your master password to unlock the vault.</p>
+            <input class="lock-input" type="password" id="masterPasswordInput" placeholder="Master password..." />
+            <button class="lock-btn" id="unlockBtn">🔓 Unlock Vault</button>
+            <div class="lock-error" id="lockError">Incorrect password. Please try again.</div>
+        </div>
+
+        <!-- Vault Content -->
+        <div id="vaultContent" class="locked">
+            <!-- Stats -->
+            <div class="stats" id="statsContainer"></div>
+
+            <!-- Platform Stats -->
+            <div class="platform-stats" id="platformStats"></div>
+
+            <!-- Toolbar -->
+            <div class="toolbar">
+                <div class="search">
+                    <span>🔍</span>
+                    <input type="text" id="searchInput" placeholder="Search by username, email, phone, notes, country..." />
+                </div>
+                <div class="filters">
+                    <select id="platformFilter">
+                        <option value="all">All Platforms</option>
+                    </select>
+                    <select id="statusFilter">
+                        <option value="all">All Status</option>
+                        <option value="active">Active</option>
+                        <option value="suspended">Suspended</option>
+                        <option value="banned">Banned</option>
+                        <option value="inactive">Inactive</option>
+                    </select>
+                    <select id="tagFilter">
+                        <option value="all">All Tags</option>
+                    </select>
+                    <select id="sortFilter">
+                        <option value="newest">Newest</option>
+                        <option value="oldest">Oldest</option>
+                        <option value="followers">Most Followers</option>
+                        <option value="priority">Priority</option>
+                    </select>
+                </div>
+                <button class="add-btn" id="addAccountBtn">➕ Add Account</button>
+            </div>
+
+            <!-- Account List -->
+            <div class="account-list" id="accountList"></div>
+
+            <!-- Bulk Bar -->
+            <div class="bulk-bar" id="bulkBar">
+                <span class="info" id="bulkInfo">☑️ <strong>0</strong> selected</span>
+                <button class="bulk-btn success" id="bulkExportBtn">📤 Export Selected</button>
+                <button class="bulk-btn" id="bulkAddTagBtn">🏷️ Add Tag</button>
+                <button class="bulk-btn" id="bulkStatusBtn">📊 Change Status</button>
+                <button class="bulk-btn danger" id="bulkDeleteBtn">🗑️ Delete Selected</button>
+                <button class="bulk-btn" id="selectAllBtn" style="margin-left:auto;">📋 Select All</button>
+            </div>
+
+            <!-- Activity Log -->
+            <div class="activity-preview">
+                <div class="title">📋 Recent Activity</div>
+                <div id="activityLogContainer"></div>
+                <div style="text-align:right;margin-top:6px;">
+                    <button style="background:transparent;border:1px solid #2A2A2A;color:#A0A0A0;padding:4px 16px;border-radius:20px;font-size:11px;cursor:pointer;" id="viewAllActivityBtn">View All Activity →</button>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="footer">
+                <span>© 2026 Social Vault · Premium Admin Tool</span>
+                <span class="secure">🔒 End‑to‑End Encrypted · All Data Stored Locally</span>
+                <span id="vaultStats">0 accounts</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== MODALS ===== -->
+
+    <!-- Add/Edit Account Modal -->
+    <div class="modal-overlay" id="accountModal">
+        <div class="modal">
+            <h2 id="accountModalTitle">Add Account</h2>
+            <div class="sub" id="accountModalSub">Enter the account details.</div>
+            <form id="accountForm">
+                <div class="row">
+                    <div class="half">
+                        <label>Platform *</label>
+                        <select id="formPlatform" required>
+                            <option value="tiktok">🎵 TikTok</option>
+                            <option value="facebook">🔵 Facebook</option>
+                            <option value="snapchat">🟡 Snapchat</option>
+                            <option value="instagram">📸 Instagram</option>
+                            <option value="youtube">▶️ YouTube</option>
+                            <option value="twitter">🐦 Twitter</option>
+                            <option value="custom">🔧 Custom</option>
+                        </select>
+                    </div>
+                    <div class="half">
+                        <label>Status</label>
+                        <select id="formStatus">
+                            <option value="active">Active</option>
+                            <option value="suspended">Suspended</option>
+                            <option value="banned">Banned</option>
+                            <option value="inactive">Inactive</option>
+                        </select>
+                    </div>
+                </div>
+                <label>Username / Email *</label>
+                <input type="text" id="formUsername" placeholder="e.g., @username or email" required />
+                <label>Password</label>
+                <div style="display:flex; gap:6px; align-items:center;">
+                    <input type="text" id="formPassword" placeholder="Enter password" style="flex:1;" />
+                    <button type="button" class="helper-btn" id="generatePasswordBtn">🔑 Generate</button>
+                </div>
+                <label>2FA Backup Codes (optional)</label>
+                <textarea id="formTwoFactor" placeholder="Enter backup codes, one per line"></textarea>
+                <div class="row">
+                    <div class="half">
+                        <label>Phone (Primary)</label>
+                        <input type="text" id="formPhone" placeholder="+1 234 567 8900" />
+                    </div>
+                    <div class="half">
+                        <label>Phone (Backup)</label>
+                        <input type="text" id="formPhoneBackup" placeholder="+1 987 654 3210" />
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="half">
+                        <label>Country / Region</label>
+                        <input type="text" id="formCountry" placeholder="e.g., USA, UK, Nigeria" />
+                    </div>
+                    <div class="half">
+                        <label>Niche / Category</label>
+                        <input type="text" id="formNiche" placeholder="e.g., Beauty, Finance" />
+                    </div>
+                </div>
+                <label>Followers Count</label>
+                <input type="number" id="formFollowers" placeholder="0" />
+                <label>Profile Image / Attachment</label>
+                <div class="file-upload-area" id="imageUploadArea">
+                    <span>📸 Click to upload or paste image URL</span>
+                    <input type="file" id="imageFileInput" accept="image/*" />
+                    <div id="imagePreviewContainer" style="display:none; margin-top:8px;">
+                        <img id="imagePreviewThumb" class="preview-thumb" src="" alt="Preview" />
+                        <button type="button" id="removeImageBtn" style="background:rgba(239,68,68,0.1);color:var(--danger);border:1px solid var(--danger);padding:2px 10px;border-radius:4px;cursor:pointer;margin-left:8px;">Remove</button>
+                    </div>
+                </div>
+                <div class="image-url-area">
+                    <input type="text" id="formImageUrl" placeholder="Or paste image URL here..." />
+                    <button type="button" id="applyImageUrlBtn" class="helper-btn">Apply</button>
+                </div>
+                <label>Tags</label>
+                <div class="tag-input-area" id="tagInputArea">
+                    <input type="text" id="formTagInput" placeholder="Type tag and press Enter" style="flex:1;margin-bottom:0;" />
+                    <button type="button" id="addTagBtn" class="helper-btn">Add</button>
+                </div>
+                <div id="tagContainer" style="display:flex;flex-wrap:wrap;gap:4px;margin-top:4px;"></div>
+                <label>Notes</label>
+                <textarea id="formNotes" placeholder="Any additional notes..."></textarea>
+                <div class="row">
+                    <div class="half">
+                        <label>⭐ Priority</label>
+                        <select id="formPriority">
+                            <option value="0">Normal</option>
+                            <option value="1">⭐ High Priority</option>
+                        </select>
+                    </div>
+                    <div class="half">
+                        <label>Direct Profile Link</label>
+                        <input type="url" id="formProfileLink" placeholder="https://tiktok.com/@username" />
+                    </div>
+                </div>
+                <input type="hidden" id="formEditId" value="" />
+                <div class="btn-group">
+                    <button type="submit" class="submit-btn" id="formSubmitBtn">Save Account</button>
+                    <button type="button" class="cancel-btn" id="formCancelBtn">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Details Modal -->
+    <div class="modal-overlay details-modal" id="detailsModal">
+        <div class="modal">
+            <h2 id="detailsTitle">Account Details</h2>
+            <div class="details-grid" id="detailsGrid"></div>
+            <div style="margin-top:12px;" id="detailsImageContainer"></div>
+            <div style="margin-top:12px;" id="detailsActivityLog"></div>
+            <div class="btn-group">
+                <button class="cancel-btn" id="detailsCloseBtn">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div class="modal-overlay settings-modal" id="settingsModal">
+        <div class="modal">
+            <h2>⚙️ Settings</h2>
+            <div class="sub">Manage vault preferences.</div>
+            <label>Change Master Password</label>
+            <input type="password" id="settingsNewPassword" placeholder="New master password" />
+            <input type="password" id="settingsConfirmPassword" placeholder="Confirm new password" />
+            <button class="submit-btn" id="settingsSavePassword" style="margin-bottom:16px;">Update Password</button>
+            <hr style="border-color:var(--border-color); margin:12px 0;" />
+            <label>Auto‑Lock Timeout (minutes)</label>
+            <input type="number" id="settingsTimeout" value="15" min="1" max="120" />
+            <button class="submit-btn" id="settingsSaveTimeout" style="margin-bottom:16px;">Save Timeout</button>
+            <hr style="border-color:var(--border-color); margin:12px 0;" />
+            <label>Default Platform</label>
+            <select id="settingsDefaultPlatform">
+                <option value="tiktok">🎵 TikTok</option>
+                <option value="facebook">🔵 Facebook</option>
+                <option value="snapchat">🟡 Snapchat</option>
+                <option value="instagram">📸 Instagram</option>
+                <option value="youtube">▶️ YouTube</option>
+                <option value="twitter">🐦 Twitter</option>
+                <option value="custom">🔧 Custom</option>
+            </select>
+            <button class="submit-btn" id="settingsSaveDefaultPlatform">Save Default Platform</button>
+            <div class="btn-group" style="margin-top:16px;">
+                <button class="cancel-btn" id="settingsCloseBtn" style="width:100%;">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Backup Modal -->
+    <div class="modal-overlay" id="backupModal">
+        <div class="modal">
+            <h2>💾 Backup & Restore</h2>
+            <div class="sub">Export or import all account data.</div>
+            <button class="submit-btn" id="exportDataBtn" style="margin-bottom:10px;">📤 Export All Data (JSON)</button>
+            <div class="file-upload-area" style="border-color:var(--accent-gold);">
+                <span>📥 Click to import a backup file</span>
+                <input type="file" id="importFileInput" accept=".json" />
+            </div>
+            <div class="btn-group" style="margin-top:16px;">
+                <button class="cancel-btn" id="backupCloseBtn" style="width:100%;">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bulk Tag Modal -->
+    <div class="modal-overlay" id="bulkTagModal">
+        <div class="modal">
+            <h2>🏷️ Add Tag to Selected</h2>
+            <div class="sub">Enter a tag to add to all selected accounts.</div>
+            <input type="text" id="bulkTagInput" placeholder="e.g., #vip" />
+            <div class="btn-group">
+                <button class="submit-btn" id="bulkTagApplyBtn">Apply</button>
+                <button class="cancel-btn" id="bulkTagCancelBtn">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bulk Status Modal -->
+    <div class="modal-overlay" id="bulkStatusModal">
+        <div class="modal">
+            <h2>📊 Change Status for Selected</h2>
+            <div class="sub">Select the new status.</div>
+            <select id="bulkStatusSelect">
+                <option value="active">Active</option>
+                <option value="suspended">Suspended</option>
+                <option value="banned">Banned</option>
+                <option value="inactive">Inactive</option>
+            </select>
+            <div class="btn-group">
+                <button class="submit-btn" id="bulkStatusApplyBtn">Apply</button>
+                <button class="cancel-btn" id="bulkStatusCancelBtn">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- All Activity Log Modal -->
+    <div class="modal-overlay" id="activityLogModal">
+        <div class="modal">
+            <h2>📋 Full Activity Log</h2>
+            <div class="sub">All actions ever recorded.</div>
+            <div id="fullActivityLogContainer" style="max-height:400px;overflow-y:auto;"></div>
+            <div class="btn-group">
+                <button class="cancel-btn" id="activityLogCloseBtn" style="width:100%;">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast"></div>
+
+</div>
+
+<script>
+    (function() {
+        'use strict';
+
+        // ---------- CONFIG ----------
+        const STORAGE_KEY = 'social_vault_data';
+        const SETTINGS_KEY = 'social_vault_settings';
+        const DEFAULT_MASTER_PASSWORD = 'admin123'; // Default, change on first use.
+
+        // ---------- STATE ----------
+        let masterPassword = DEFAULT_MASTER_PASSWORD;
+        let isUnlocked = false;
+        let accounts = [];
+        let settings = {
+            timeout: 15, // minutes
+            defaultPlatform: 'tiktok'
+        };
+        let selectedIds = new Set();
+        let editingId = null;
+        let currentTags = [];
+        let currentImageData = null; // base64 or URL
+        let activityLog = [];
+
+        // ---------- DOM REFS ----------
+        const vaultContent = document.getElementById('vaultContent');
+        const lockOverlay = document.getElementById('lockOverlay');
+        const masterPasswordInput = document.getElementById('masterPasswordInput');
+        const unlockBtn = document.getElementById('unlockBtn');
+        const lockError = document.getElementById('lockError');
+        const lockToggleBtn = document.getElementById('lockToggleBtn');
+        const openSettingsBtn = document.getElementById('openSettingsBtn');
+        const openBackupBtn = document.getElementById('openBackupBtn');
+
+        const statsContainer = document.getElementById('statsContainer');
+        const platformStats = document.getElementById('platformStats');
+        const accountList = document.getElementById('accountList');
+        const searchInput = document.getElementById('searchInput');
+        const platformFilter = document.getElementById('platformFilter');
+        const statusFilter = document.getElementById('statusFilter');
+        const tagFilter = document.getElementById('tagFilter');
+        const sortFilter = document.getElementById('sortFilter');
+        const addAccountBtn = document.getElementById('addAccountBtn');
+        const bulkInfo = document.getElementById('bulkInfo');
+        const selectAllBtn = document.getElementById('selectAllBtn');
+        const bulkDeleteBtn = document.getElementById('bulkDeleteBtn');
+        const bulkExportBtn = document.getElementById('bulkExportBtn');
+        const bulkAddTagBtn = document.getElementById('bulkAddTagBtn');
+        const bulkStatusBtn = document.getElementById('bulkStatusBtn');
+        const viewAllActivityBtn = document.getElementById('viewAllActivityBtn');
+
+        const accountModal = document.getElementById('accountModal');
+        const accountModalTitle = document.getElementById('accountModalTitle');
+        const accountModalSub = document.getElementById('accountModalSub');
+        const accountForm = document.getElementById('accountForm');
+        const formPlatform = document.getElementById('formPlatform');
+        const formStatus = document.getElementById('formStatus');
+        const formUsername = document.getElementById('formUsername');
+        const formPassword = document.getElementById('formPassword');
+        const formTwoFactor = document.getElementById('formTwoFactor');
+        const formPhone = document.getElementById('formPhone');
+        const formPhoneBackup = document.getElementById('formPhoneBackup');
+        const formCountry = document.getElementById('formCountry');
+        const formNiche = document.getElementById('formNiche');
+        const formFollowers = document.getElementById('formFollowers');
+        const formImageUrl = document.getElementById('formImageUrl');
+        const applyImageUrlBtn = document.getElementById('applyImageUrlBtn');
+        const formTagInput = document.getElementById('formTagInput');
+        const addTagBtn = document.getElementById('addTagBtn');
+        const tagContainer = document.getElementById('tagContainer');
+        const formNotes = document.getElementById('formNotes');
+        const formPriority = document.getElementById('formPriority');
+        const formProfileLink = document.getElementById('formProfileLink');
+        const formEditId = document.getElementById('formEditId');
+        const formSubmitBtn = document.getElementById('formSubmitBtn');
+        const formCancelBtn = document.getElementById('formCancelBtn');
+        const generatePasswordBtn = document.getElementById('generatePasswordBtn');
+        const imageFileInput = document.getElementById('imageFileInput');
+        const imageUploadArea = document.getElementById('imageUploadArea');
+        const imagePreviewContainer = document.getElementById('imagePreviewContainer');
+        const imagePreviewThumb = document.getElementById('imagePreviewThumb');
+        const removeImageBtn = document.getElementById('removeImageBtn');
+
+        const detailsModal = document.getElementById('detailsModal');
+        const detailsTitle = document.getElementById('detailsTitle');
+        const detailsGrid = document.getElementById('detailsGrid');
+        const detailsImageContainer = document.getElementById('detailsImageContainer');
+        const detailsActivityLog = document.getElementById('detailsActivityLog');
+        const detailsCloseBtn = document.getElementById('detailsCloseBtn');
+
+        const settingsModal = document.getElementById('settingsModal');
+        const settingsNewPassword = document.getElementById('settingsNewPassword');
+        const settingsConfirmPassword = document.getElementById('settingsConfirmPassword');
+        const settingsSavePassword = document.getElementById('settingsSavePassword');
+        const settingsTimeout = document.getElementById('settingsTimeout');
+        const settingsSaveTimeout = document.getElementById('settingsSaveTimeout');
+        const settingsDefaultPlatform = document.getElementById('settingsDefaultPlatform');
+        const settingsSaveDefaultPlatform = document.getElementById('settingsSaveDefaultPlatform');
+        const settingsCloseBtn = document.getElementById('settingsCloseBtn');
+
+        const backupModal = document.getElementById('backupModal');
+        const exportDataBtn = document.getElementById('exportDataBtn');
+        const importFileInput = document.getElementById('importFileInput');
+        const backupCloseBtn = document.getElementById('backupCloseBtn');
+
+        const bulkTagModal = document.getElementById('bulkTagModal');
+        const bulkTagInput = document.getElementById('bulkTagInput');
+        const bulkTagApplyBtn = document.getElementById('bulkTagApplyBtn');
+        const bulkTagCancelBtn = document.getElementById('bulkTagCancelBtn');
+
+        const bulkStatusModal = document.getElementById('bulkStatusModal');
+        const bulkStatusSelect = document.getElementById('bulkStatusSelect');
+        const bulkStatusApplyBtn = document.getElementById('bulkStatusApplyBtn');
+        const bulkStatusCancelBtn = document.getElementById('bulkStatusCancelBtn');
+
+        const activityLogModal = document.getElementById('activityLogModal');
+        const fullActivityLogContainer = document.getElementById('fullActivityLogContainer');
+        const activityLogCloseBtn = document.getElementById('activityLogCloseBtn');
+
+        const toast = document.getElementById('toast');
+
+        // ---------- UTILITY ----------
+        function generateId() {
+            return Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+        }
+
+        function formatDate(ts) {
+            if (!ts) return 'N/A';
+            return new Date(ts).toLocaleString('en-US', { year:'numeric', month:'short', day:'numeric', hour:'2-digit', minute:'2-digit' });
+        }
+
+        function formatDateShort(ts) {
+            if (!ts) return 'N/A';
+            return new Date(ts).toLocaleDateString('en-US', { year:'numeric', month:'short', day:'numeric' });
+        }
+
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function showToast(message, type) {
+            type = type || 'info';
+            toast.textContent = message;
+            toast.className = 'toast ' + type + ' visible';
+            clearTimeout(toast._timeout);
+            toast._timeout = setTimeout(function() {
+                toast.classList.remove('visible');
+            }, 3000);
+        }
+
+        // ---------- ENCRYPTION (simple XOR obfuscation) ----------
+        function xorEncrypt(text, key) {
+            if (!text) return '';
+            let result = '';
+            for (let i = 0; i < text.length; i++) {
+                const charCode = text.charCodeAt(i) ^ key.charCodeAt(i % key.length);
+                result += String.fromCharCode(charCode);
+            }
+            return btoa(result);
+        }
+
+        function xorDecrypt(encoded, key) {
+            if (!encoded) return '';
+            try {
+                const text = atob(encoded);
+                let result = '';
+                for (let i = 0; i < text.length; i++) {
+                    const charCode = text.charCodeAt(i) ^ key.charCodeAt(i % key.length);
+                    result += String.fromCharCode(charCode);
+                }
+                return result;
+            } catch (e) {
+                return '';
+            }
+        }
+
+        // ---------- STORAGE ----------
+        function loadData() {
+            try {
+                const raw = localStorage.getItem(STORAGE_KEY);
+                if (raw) {
+                    const parsed = JSON.parse(raw);
+                    accounts = parsed.accounts || [];
+                    activityLog = parsed.activityLog || [];
+                } else {
+                    accounts = [];
+                    activityLog = [];
+                }
+            } catch (e) {
+                accounts = [];
+                activityLog = [];
+            }
+        }
+
+        function saveData() {
+            const data = {
+                accounts: accounts,
+                activityLog: activityLog
+            };
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+        }
+
+        function loadSettings() {
+            try {
+                const raw = localStorage.getItem(SETTINGS_KEY);
+                if (raw) {
+                    const parsed = JSON.parse(raw);
+                    settings = { ...settings, ...parsed };
+                }
+            } catch (e) {}
+        }
+
+        function saveSettings() {
+            localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
+        }
+
+        // ---------- MASTER PASSWORD ----------
+        function setMasterPassword(newPw) {
+            masterPassword = newPw;
+            // Store obfuscated password in settings (not secure, but it's a local tool)
+            settings.masterHash = xorEncrypt(newPw, 'salt');
+            saveSettings();
+        }
+
+        function verifyMasterPassword(input) {
+            const storedHash = settings.masterHash || xorEncrypt(DEFAULT_MASTER_PASSWORD, 'salt');
+            const expected = xorDecrypt(storedHash, 'salt');
+            return input === expected;
+        }
+
+        // ---------- LOCK / UNLOCK ----------
+        function lockVault() {
+            isUnlocked = false;
+            vaultContent.className = 'locked';
+            lockOverlay.classList.add('active');
+            lockToggleBtn.textContent = '🔒 Lock';
+            lockToggleBtn.style.borderColor = 'var(--accent-gold)';
+            lockToggleBtn.style.color = 'var(--accent-gold)';
+            masterPasswordInput.value = '';
+            lockError.style.display = 'none';
+            showToast('🔒 Vault locked', 'info');
+        }
+
+        function unlockVault(password) {
+            if (verifyMasterPassword(password)) {
+                isUnlocked = true;
+                vaultContent.className = 'unlocked';
+                lockOverlay.classList.remove('active');
+                lockToggleBtn.textContent = '🔓 Unlocked';
+                lockToggleBtn.style.borderColor = 'var(--success)';
+                lockToggleBtn.style.color = 'var(--success)';
+                lockError.style.display = 'none';
+                // Decrypt sensitive fields in accounts
+                accounts = accounts.map(acc => {
+                    if (acc._encrypted) {
+                        acc.password = xorDecrypt(acc.password, masterPassword);
+                        acc.twoFactor = xorDecrypt(acc.twoFactor, masterPassword);
+                        acc._encrypted = false;
+                    }
+                    return acc;
+                });
+                saveData();
+                renderDashboard();
+                showToast('🔓 Vault unlocked', 'success');
+                // Start auto-lock timer
+                startAutoLockTimer();
+            } else {
+                lockError.style.display = 'block';
+                showToast('❌ Incorrect password', 'error');
+            }
+        }
+
+        let autoLockTimer = null;
+
+        function startAutoLockTimer() {
+            clearTimeout(autoLockTimer);
+            const timeoutMs = (settings.timeout || 15) * 60 * 1000;
+            autoLockTimer = setTimeout(function() {
+                if (isUnlocked) {
+                    lockVault();
+                }
+            }, timeoutMs);
+        }
+
+        function resetAutoLockTimer() {
+            if (isUnlocked) {
+                clearTimeout(autoLockTimer);
+                startAutoLockTimer();
+            }
+        }
+
+        // ---------- ACTIVITY LOG ----------
+        function addActivityLog(message, accountId) {
+            activityLog.push({
+                time: Date.now(),
+                message: message,
+                accountId: accountId || null
+            });
+            if (activityLog.length > 1000) activityLog.shift(); // keep last 1000
+            saveData();
+        }
+
+        // ---------- CRUD ACCOUNTS ----------
+        function createAccount(data) {
+            const newAccount = {
+                id: generateId(),
+                platform: data.platform || 'tiktok',
+                username: data.username || '',
+                password: data.password || '',
+                twoFactor: data.twoFactor || '',
+                phone: data.phone || '',
+                phoneBackup: data.phoneBackup || '',
+                country: data.country || '',
+                niche: data.niche || '',
+                followers: data.followers || 0,
+                image: data.image || '',
+                tags: data.tags || [],
+                notes: data.notes || '',
+                priority: data.priority || 0,
+                profileLink: data.profileLink || '',
+                status: data.status || 'active',
+                createdAt: Date.now(),
+                updatedAt: Date.now(),
+                lastPasswordChange: Date.now(),
+                activity: [] // per-account mini-log
+            };
+            // Encrypt sensitive fields
+            newAccount.password = xorEncrypt(newAccount.password, masterPassword);
+            newAccount.twoFactor = xorEncrypt(newAccount.twoFactor, masterPassword);
+            newAccount._encrypted = true;
+            accounts.push(newAccount);
+            saveData();
+            addActivityLog('➕ Added account: ' + newAccount.username + ' (' + newAccount.platform + ')', newAccount.id);
+            return newAccount;
+        }
+
+        function updateAccount(id, data) {
+            const idx = accounts.findIndex(a => a.id === id);
+            if (idx === -1) return null;
+            const acc = accounts[idx];
+            // Decrypt before updating if needed
+            if (acc._encrypted) {
+                acc.password = xorDecrypt(acc.password, masterPassword);
+                acc.twoFactor = xorDecrypt(acc.twoFactor, masterPassword);
+                acc._encrypted = false;
+            }
+            const oldData = { ...acc };
+            // Update fields
+            acc.platform = data.platform || acc.platform;
+            acc.username = data.username || acc.username;
+            if (data.password !== undefined) acc.password = data.password;
+            if (data.twoFactor !== undefined) acc.twoFactor = data.twoFactor;
+            acc.phone = data.phone || acc.phone;
+            acc.phoneBackup = data.phoneBackup || acc.phoneBackup;
+            acc.country = data.country || acc.country;
+            acc.niche = data.niche || acc.niche;
+            acc.followers = data.followers !== undefined ? data.followers : acc.followers;
+            acc.image = data.image !== undefined ? data.image : acc.image;
+            acc.tags = data.tags || acc.tags;
+            acc.notes = data.notes || acc.notes;
+            acc.priority = data.priority !== undefined ? data.priority : acc.priority;
+            acc.profileLink = data.profileLink || acc.profileLink;
+            acc.status = data.status || acc.status;
+            acc.updatedAt = Date.now();
+            if (data.password && data.password !== oldData.password) {
+                acc.lastPasswordChange = Date.now();
+                acc.activity.push({ time: Date.now(), msg: 'Password changed' });
+            }
+            // Re-encrypt
+            acc.password = xorEncrypt(acc.password, masterPassword);
+            acc.twoFactor = xorEncrypt(acc.twoFactor, masterPassword);
+            acc._encrypted = true;
+            accounts[idx] = acc;
+            saveData();
+            addActivityLog('✏️ Updated account: ' + acc.username + ' (' + acc.platform + ')', acc.id);
+            return acc;
+        }
+
+        function deleteAccount(id) {
+            const idx = accounts.findIndex(a => a.id === id);
+            if (idx === -1) return;
+            const acc = accounts[idx];
+            accounts.splice(idx, 1);
+            saveData();
+            addActivityLog('🗑️ Deleted account: ' + acc.username + ' (' + acc.platform + ')', id);
+        }
+
+        function getAccount(id) {
+            return accounts.find(a => a.id === id);
+        }
+
+        // ---------- RENDER DASHBOARD ----------
+        function renderDashboard() {
+            renderStats();
+            renderPlatformStats();
+            renderAccountList();
+            renderActivityLog();
+            renderBulkBar();
+            renderFilters();
+        }
+
+        function renderStats() {
+            const total = accounts.length;
+            const active = accounts.filter(a => a.status === 'active').length;
+            const suspended = accounts.filter(a => a.status === 'suspended').length;
+            const banned = accounts.filter(a => a.status === 'banned').length;
+            const inactive = accounts.filter(a => a.status === 'inactive').length;
+            const totalFollowers = accounts.reduce((sum, a) => sum + (a.followers || 0), 0);
+
+            statsContainer.innerHTML = `
+                <div class="stat-card"><div class="number">${total}</div><div class="label">Total Accounts</div></div>
+                <div class="stat-card"><div class="number">${active}</div><div class="label">🟢 Active</div></div>
+                <div class="stat-card"><div class="number">${suspended}</div><div class="label">🟡 Suspended</div></div>
+                <div class="stat-card"><div class="number">${banned}</div><div class="label">🔴 Banned</div></div>
+                <div class="stat-card"><div class="number">${inactive}</div><div class="label">⚪ Inactive</div></div>
+                <div class="stat-card"><div class="number">${totalFollowers.toLocaleString()}</div><div class="label">Total Followers</div></div>
+            `;
+            document.getElementById('vaultStats').textContent = total + ' accounts';
+        }
+
+        function renderPlatformStats() {
+            const platforms = {};
+            accounts.forEach(a => {
+                platforms[a.platform] = (platforms[a.platform] || 0) + 1;
+            });
+            const platformNames = {
+                tiktok: '🎵 TikTok',
+                facebook: '🔵 Facebook',
+                snapchat: '🟡 Snapchat',
+                instagram: '📸 Instagram',
+                youtube: '▶️ YouTube',
+                twitter: '🐦 Twitter',
+                custom: '🔧 Custom'
+            };
+            let html = '';
+            let total = accounts.length;
+            for (const [key, count] of Object.entries(platforms)) {
+                const label = platformNames[key] || key;
+                html += `<span class="platform-stat">${label} <span class="count">${count}</span></span>`;
+            }
+            if (total === 0) html = '<span style="color:var(--text-secondary);font-size:13px;">No accounts added yet.</span>';
+            platformStats.innerHTML = html;
+        }
+
+        function renderFilters() {
+            // Populate platform filter options dynamically
+            const currentPlatformFilter = platformFilter.value;
+            const platforms = new Set(accounts.map(a => a.platform));
+            const platformNames = {
+                tiktok: '🎵 TikTok',
+                facebook: '🔵 Facebook',
+                snapchat: '🟡 Snapchat',
+                instagram: '📸 Instagram',
+                youtube: '▶️ YouTube',
+                twitter: '🐦 Twitter',
+                custom: '🔧 Custom'
+            };
+            let html = '<option value="all">All Platforms</option>';
+            for (const p of platforms) {
+                const label = platformNames[p] || p;
+                html += `<option value="${p}" ${p === currentPlatformFilter ? 'selected' : ''}>${label}</option>`;
+            }
+            platformFilter.innerHTML = html;
+
+            // Populate tag filter
+            const currentTagFilter = tagFilter.value;
+            const allTags = new Set();
+            accounts.forEach(a => (a.tags || []).forEach(t => allTags.add(t)));
+            let tagHtml = '<option value="all">All Tags</option>';
+            for (const t of allTags) {
+                tagHtml += `<option value="${t}" ${t === currentTagFilter ? 'selected' : ''}>${t}</option>`;
+            }
+            tagFilter.innerHTML = tagHtml;
+        }
+
+        function renderAccountList() {
+            const search = searchInput.value.toLowerCase().trim();
+            const platform = platformFilter.value;
+            const status = statusFilter.value;
+            const tag = tagFilter.value;
+            const sort = sortFilter.value;
+
+            let filtered = accounts.filter(a => {
+                if (a._encrypted) {
+                    // Decrypt for search
+                    a._tempPassword = xorDecrypt(a.password, masterPassword);
+                    a._tempTwoFactor = xorDecrypt(a.twoFactor, masterPassword);
+                } else {
+                    a._tempPassword = a.password;
+                    a._tempTwoFactor = a.twoFactor;
+                }
+                const username = (a.username || '').toLowerCase();
+                const email = a.username || '';
+                const phone = (a.phone || '').toLowerCase();
+                const notes = (a.notes || '').toLowerCase();
+                const country = (a.country || '').toLowerCase();
+                const matchSearch = !search || username.includes(search) || email.includes(search) || phone.includes(search) || notes.includes(search) || country.includes(search);
+                const matchPlatform = platform === 'all' || a.platform === platform;
+                const matchStatus = status === 'all' || a.status === status;
+                const matchTag = tag === 'all' || (a.tags || []).includes(tag);
+                return matchSearch && matchPlatform && matchStatus && matchTag;
+            });
+
+            // Sort
+            switch (sort) {
+                case 'newest': filtered.sort((a,b) => b.createdAt - a.createdAt); break;
+                case 'oldest': filtered.sort((a,b) => a.createdAt - b.createdAt); break;
+                case 'followers': filtered.sort((a,b) => (b.followers || 0) - (a.followers || 0)); break;
+                case 'priority': filtered.sort((a,b) => (b.priority || 0) - (a.priority || 0)); break;
+                default: filtered.sort((a,b) => b.createdAt - a.createdAt);
+            }
+
+            if (filtered.length === 0) {
+                accountList.innerHTML = `<div class="empty-state" style="text-align:center;padding:40px;color:var(--text-secondary);">📭 No accounts found. Click "Add Account" to get started.</div>`;
+                return;
+            }
+
+            let html = '';
+            filtered.forEach(a => {
+                const platformEmoji = {
+                    tiktok: '🎵',
+                    facebook: '🔵',
+                    snapchat: '🟡',
+                    instagram: '📸',
+                    youtube: '▶️',
+                    twitter: '🐦',
+                    custom: '🔧'
+                };
+                const emoji = platformEmoji[a.platform] || '🔧';
+                const statusBadge = `<span class="badge ${a.status}">${a.status}</span>`;
+                const tagsHtml = (a.tags || []).map(t => `<span class="tag">${escapeHtml(t)}</span>`).join(' ');
+                const followerDisplay = a.followers ? a.followers.toLocaleString() : '0';
+                const countryFlag = a.country ? '🌍 ' + a.country : '';
+                const priorityStar = a.priority ? '⭐ ' : '';
+                const imageThumb = a.image ? `<img src="${a.image}" class="thumbnail" alt="thumb" />` :
+                    `<span class="no-thumb">📸</span>`;
+                const checked = selectedIds.has(a.id) ? 'checked' : '';
+
+                html += `
+                    <div class="account-row" data-id="${a.id}">
+                        <div class="col-check"><input type="checkbox" class="account-checkbox" data-id="${a.id}" ${checked} /></div>
+                        <div class="col-info">
+                            <div class="username">
+                                ${priorityStar} ${emoji} ${escapeHtml(a.username)}
+                                <span class="email">• ${escapeHtml(a.username)}</span>
+                            </div>
+                            <div class="meta">
+                                ${statusBadge}
+                                <span>${a.niche || 'General'}</span>
+                                ${a.phone ? `<span>📱 ${escapeHtml(a.phone)}</span>` : ''}
+                                ${countryFlag}
+                                ${tagsHtml}
+                            </div>
+                        </div>
+                        <div class="col-followers">
+                            ${followerDisplay}
+                            <span class="change up">▲</span>
+                        </div>
+                        <div class="col-actions">
+                            <button class="view-btn" data-id="${a.id}" title="View">👁️</button>
+                            <button class="edit-btn" data-id="${a.id}" title="Edit" class="primary">✏️</button>
+                            <button class="copy-pass-btn" data-id="${a.id}" title="Copy Password">📋</button>
+                            <button class="delete-btn" data-id="${a.id}" title="Delete" class="danger">🗑️</button>
+                        </div>
+                    </div>
+                `;
+            });
+            accountList.innerHTML = html;
+
+            // Attach events
+            document.querySelectorAll('.account-checkbox').forEach(cb => {
+                cb.addEventListener('change', function() {
+                    const id = this.dataset.id;
+                    if (this.checked) {
+                        selectedIds.add(id);
+                    } else {
+                        selectedIds.delete(id);
+                    }
+                    renderBulkBar();
+                });
+            });
+
+            document.querySelectorAll('.view-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const id = this.dataset.id;
+                    showDetails(id);
+                });
+            });
+
+            document.querySelectorAll('.edit-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const id = this.dataset.id;
+                    openEditModal(id);
+                });
+            });
+
+            document.querySelectorAll('.copy-pass-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const id = this.dataset.id;
+                    const account = getAccount(id);
+                    if (account) {
+                        let pass = account._encrypted ? xorDecrypt(account.password, masterPassword) : account.password;
+                        if (pass) {
+                            copyToClipboard(pass, '✅ Password copied!');
+                        } else {
+                            showToast('No password set.', 'info');
+                        }
+                    }
+                });
+            });
+
+            document.querySelectorAll('.delete-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const id = this.dataset.id;
+                    if (confirm('Delete this account?')) {
+                        deleteAccount(id);
+                        renderDashboard();
+                        showToast('Account deleted.', 'info');
+                    }
+                });
+            });
+        }
+
+        function renderBulkBar() {
+            const count = selectedIds.size;
+            bulkInfo.innerHTML = `☑️ <strong>${count}</strong> selected`;
+            // Enable/disable bulk buttons
+            const btns = [bulkDeleteBtn, bulkExportBtn, bulkAddTagBtn, bulkStatusBtn];
+            btns.forEach(b => b.disabled = count === 0);
+        }
+
+        function renderActivityLog() {
+            const container = document.getElementById('activityLogContainer');
+            const recent = activityLog.slice(-5).reverse();
+            if (recent.length === 0) {
+                container.innerHTML = '<div style="color:var(--text-secondary);font-size:12px;">No activity yet.</div>';
+                return;
+            }
+            let html = '';
+            recent.forEach(log => {
+                html += `
+                    <div class="log-item">
+                        <span>${escapeHtml(log.message)}</span>
+                        <span class="time">${formatDate(log.time)}</span>
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+        }
+
+        // ---------- DETAILS MODAL ----------
+        function showDetails(id) {
+            const account = getAccount(id);
+            if (!account) return;
+            // Decrypt sensitive fields for display
+            let pass = account._encrypted ? xorDecrypt(account.password, masterPassword) : account.password;
+            let twoFactor = account._encrypted ? xorDecrypt(account.twoFactor, masterPassword) : account.twoFactor;
+            const platformNames = {
+                tiktok: '🎵 TikTok',
+                facebook: '🔵 Facebook',
+                snapchat: '🟡 Snapchat',
+                instagram: '📸 Instagram',
+                youtube: '▶️ YouTube',
+                twitter: '🐦 Twitter',
+                custom: '🔧 Custom'
+            };
+            detailsTitle.textContent = `👤 ${account.username}`;
+            const statusBadge = `<span class="badge ${account.status}">${account.status}</span>`;
+            const tagsHtml = (account.tags || []).map(t => `<span class="tag">${escapeHtml(t)}</span>`).join(' ');
+            let gridHtml = `
+                <div class="item"><span class="label">Platform</span><div class="value">${platformNames[account.platform] || account.platform}</div></div>
+                <div class="item"><span class="label">Status</span><div class="value">${statusBadge}</div></div>
+                <div class="item"><span class="label">Username</span><div class="value">${escapeHtml(account.username)}</div></div>
+                <div class="item"><span class="label">Password</span><div class="value">${escapeHtml(pass) || '—'}</div></div>
+                <div class="item full"><span class="label">2FA Backup Codes</span><div class="value">${escapeHtml(twoFactor) || '—'}</div></div>
+                <div class="item"><span class="label">Phone (Primary)</span><div class="value">${escapeHtml(account.phone) || '—'}</div></div>
+                <div class="item"><span class="label">Phone (Backup)</span><div class="value">${escapeHtml(account.phoneBackup) || '—'}</div></div>
+                <div class="item"><span class="label">Country</span><div class="value">${escapeHtml(account.country) || '—'}</div></div>
+                <div class="item"><span class="label">Niche</span><div class="value">${escapeHtml(account.niche) || '—'}</div></div>
+                <div class="item"><span class="label">Followers</span><div class="value">${(account.followers || 0).toLocaleString()}</div></div>
+                <div class="item"><span class="label">Priority</span><div class="value">${account.priority ? '⭐ High' : 'Normal'}</div></div>
+                <div class="item"><span class="label">Created</span><div class="value">${formatDate(account.createdAt)}</div></div>
+                <div class="item"><span class="label">Updated</span><div class="value">${formatDate(account.updatedAt)}</div></div>
+                <div class="item full"><span class="label">Tags</span><div class="value">${tagsHtml || '—'}</div></div>
+                <div class="item full"><span class="label">Notes</span><div class="value">${escapeHtml(account.notes) || '—'}</div></div>
+                ${account.profileLink ? `<div class="item full"><span class="label">Profile Link</span><div class="value"><a href="${escapeHtml(account.profileLink)}" target="_blank" style="color:var(--accent-gold);">${escapeHtml(account.profileLink)}</a></div></div>` : ''}
+            `;
+            detailsGrid.innerHTML = gridHtml;
+
+            // Image
+            if (account.image) {
+                detailsImageContainer.innerHTML = `<img src="${account.image}" class="thumbnail-large" alt="profile" />`;
+            } else {
+                detailsImageContainer.innerHTML = '';
+            }
+
+            // Per-account activity log
+            const accActivity = account.activity || [];
+            if (accActivity.length > 0) {
+                let actHtml = '<div style="margin-top:8px;"><strong style="color:var(--text-secondary);font-size:13px;">📋 Account Activity</strong><div style="font-size:12px;color:#888;max-height:120px;overflow-y:auto;margin-top:4px;">';
+                accActivity.slice().reverse().forEach(a => {
+                    actHtml += `<div style="padding:2px 0;border-bottom:1px solid #1A1A1A;">${escapeHtml(a.msg)} <span style="color:#555;">${formatDate(a.time)}</span></div>`;
+                });
+                actHtml += '</div></div>';
+                detailsActivityLog.innerHTML = actHtml;
+            } else {
+                detailsActivityLog.innerHTML = '';
+            }
+
+            detailsModal.classList.add('active');
+        }
+
+        // ---------- MODAL OPEN/CLOSE ----------
+        function openAddModal() {
+            editingId = null;
+            accountModalTitle.textContent = '➕ Add Account';
+            accountModalSub.textContent = 'Enter the account details.';
+            formSubmitBtn.textContent = 'Save Account';
+            accountForm.reset();
+            formEditId.value = '';
+            currentTags = [];
+            renderTags();
+            currentImageData = null;
+            imagePreviewContainer.style.display = 'none';
+            document.getElementById('imagePreviewThumb').src = '';
+            // Set default platform from settings
+            formPlatform.value = settings.defaultPlatform || 'tiktok';
+            accountModal.classList.add('active');
+        }
+
+        function openEditModal(id) {
+            const account = getAccount(id);
+            if (!account) return;
+            editingId = id;
+            accountModalTitle.textContent = '✏️ Edit Account';
+            accountModalSub.textContent = 'Update the account details.';
+            formSubmitBtn.textContent = 'Update Account';
+            formEditId.value = id;
+
+            // Decrypt sensitive fields
+            let pass = account._encrypted ? xorDecrypt(account.password, masterPassword) : account.password;
+            let twoFactor = account._encrypted ? xorDecrypt(account.twoFactor, masterPassword) : account.twoFactor;
+
+            formPlatform.value = account.platform || 'tiktok';
+            formStatus.value = account.status || 'active';
+            formUsername.value = account.username || '';
+            formPassword.value = pass || '';
+            formTwoFactor.value = twoFactor || '';
+            formPhone.value = account.phone || '';
+            formPhoneBackup.value = account.phoneBackup || '';
+            formCountry.value = account.country || '';
+            formNiche.value = account.niche || '';
+            formFollowers.value = account.followers || '';
+            formImageUrl.value = account.image || '';
+            currentTags = account.tags || [];
+            renderTags();
+            formNotes.value = account.notes || '';
+            formPriority.value = account.priority || 0;
+            formProfileLink.value = account.profileLink || '';
+            currentImageData = account.image || null;
+            if (currentImageData) {
+                imagePreviewContainer.style.display = 'block';
+                document.getElementById('imagePreviewThumb').src = currentImageData;
+            } else {
+                imagePreviewContainer.style.display = 'none';
+            }
+            accountModal.classList.add('active');
+        }
+
+        function closeAccountModal() {
+            accountModal.classList.remove('active');
+        }
+
+        // ---------- TAGS ----------
+        function renderTags() {
+            tagContainer.innerHTML = '';
+            currentTags.forEach(tag => {
+                const span = document.createElement('span');
+                span.className = 'tag-item';
+                span.innerHTML = `${escapeHtml(tag)} <span class="remove-tag" data-tag="${escapeHtml(tag)}">×</span>`;
+                tagContainer.appendChild(span);
+            });
+            // Attach remove events
+            document.querySelectorAll('.tag-item .remove-tag').forEach(el => {
+                el.addEventListener('click', function() {
+                    const tag = this.dataset.tag;
+                    currentTags = currentTags.filter(t => t !== tag);
+                    renderTags();
+                });
+            });
+        }
+
+        function addTagFromInput() {
+            const val = formTagInput.value.trim();
+            if (val && !currentTags.includes(val)) {
+                currentTags.push(val);
+                renderTags();
+                formTagInput.value = '';
+            }
+        }
+
+        // ---------- IMAGE HANDLING ----------
+        function handleImageUpload(file) {
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const dataUrl = e.target.result;
+                currentImageData = dataUrl;
+                imagePreviewContainer.style.display = 'block';
+                document.getElementById('imagePreviewThumb').src = dataUrl;
+                showToast('Image uploaded successfully.', 'success');
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function applyImageUrl(url) {
+            if (url.trim()) {
+                currentImageData = url.trim();
+                imagePreviewContainer.style.display = 'block';
+                document.getElementById('imagePreviewThumb').src = url.trim();
+                showToast('Image URL applied.', 'success');
+            }
+        }
+
+        function removeImage() {
+            currentImageData = null;
+            imagePreviewContainer.style.display = 'none';
+            document.getElementById('imagePreviewThumb').src = '';
+            formImageUrl.value = '';
+            showToast('Image removed.', 'info');
+        }
+
+        // ---------- COPY TO CLIPBOARD ----------
+        function copyToClipboard(text, successMsg) {
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(text).then(function() {
+                    showToast(successMsg || '✅ Copied!', 'success');
+                }).catch(function() { fallbackCopy(text, successMsg); });
+            } else { fallbackCopy(text, successMsg); }
+        }
+
+        function fallbackCopy(text, successMsg) {
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+            showToast(successMsg || '✅ Copied!', 'success');
+        }
+
+        // ---------- PASSWORD GENERATOR ----------
+        function generatePassword() {
+            const length = 16;
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+-=';
+            let result = '';
+            for (let i = 0; i < length; i++) {
+                result += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            formPassword.value = result;
+            showToast('🔑 Strong password generated!', 'success');
+        }
+
+        // ---------- BULK ACTIONS ----------
+        function getSelectedAccounts() {
+            return accounts.filter(a => selectedIds.has(a.id));
+        }
+
+        function bulkDelete() {
+            if (selectedIds.size === 0) return;
+            if (confirm(`Delete ${selectedIds.size} selected accounts?`)) {
+                const ids = Array.from(selectedIds);
+                ids.forEach(id => deleteAccount(id));
+                selectedIds.clear();
+                renderDashboard();
+                showToast('🗑️ Selected accounts deleted.', 'info');
+            }
+        }
+
+        function bulkExport() {
+            const selected = getSelectedAccounts();
+            if (selected.length === 0) return;
+            // Decrypt sensitive fields for export
+            const exportData = selected.map(a => {
+                const copy = { ...a };
+                if (copy._encrypted) {
+                    copy.password = xorDecrypt(copy.password, masterPassword);
+                    copy.twoFactor = xorDecrypt(copy.twoFactor, masterPassword);
+                    copy._encrypted = false;
+                }
+                return copy;
+            });
+            const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'exported_accounts_' + new Date().toISOString().slice(0,10) + '.json';
+            a.click();
+            URL.revokeObjectURL(url);
+            showToast('📤 Exported ' + exportData.length + ' accounts.', 'success');
+        }
+
+        function bulkAddTag() {
+            if (selectedIds.size === 0) return;
+            bulkTagModal.classList.add('active');
+        }
+
+        function bulkApplyTag() {
+            const tag = bulkTagInput.value.trim();
+            if (!tag) {
+                showToast('Please enter a tag.', 'error');
+                return;
+            }
+            const selected = getSelectedAccounts();
+            selected.forEach(a => {
+                if (!a.tags) a.tags = [];
+                if (!a.tags.includes(tag)) {
+                    a.tags.push(tag);
+                    // Update in storage via saveData
+                }
+            });
+            saveData();
+            bulkTagModal.classList.remove('active');
+            bulkTagInput.value = '';
+            renderDashboard();
+            showToast('🏷️ Tag added to ' + selected.length + ' accounts.', 'success');
+        }
+
+        function bulkChangeStatus() {
+            if (selectedIds.size === 0) return;
+            bulkStatusModal.classList.add('active');
+        }
+
+        function bulkApplyStatus() {
+            const newStatus = bulkStatusSelect.value;
+            const selected = getSelectedAccounts();
+            selected.forEach(a => {
+                a.status = newStatus;
+                a.updatedAt = Date.now();
+            });
+            saveData();
+            bulkStatusModal.classList.remove('active');
+            renderDashboard();
+            showToast('📊 Status updated for ' + selected.length + ' accounts.', 'success');
+        }
+
+        function selectAll() {
+            const checkboxes = document.querySelectorAll('.account-checkbox');
+            const allChecked = Array.from(checkboxes).every(cb => cb.checked);
+            checkboxes.forEach(cb => cb.checked = !allChecked);
+            // Update selectedIds
+            if (!allChecked) {
+                // select all
+                checkboxes.forEach(cb => selectedIds.add(cb.dataset.id));
+            } else {
+                // deselect all
+                selectedIds.clear();
+            }
+            renderBulkBar();
+        }
+
+        // ---------- BACKUP ----------
+        function exportAllData() {
+            // Decrypt all for export
+            const exportData = accounts.map(a => {
+                const copy = { ...a };
+                if (copy._encrypted) {
+                    copy.password = xorDecrypt(copy.password, masterPassword);
+                    copy.twoFactor = xorDecrypt(copy.twoFactor, masterPassword);
+                    copy._encrypted = false;
+                }
+                return copy;
+            });
+            const payload = {
+                accounts: exportData,
+                activityLog: activityLog,
+                settings: settings,
+                exportedAt: Date.now()
+            };
+            const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'social_vault_backup_' + new Date().toISOString().slice(0,10) + '.json';
+            a.click();
+            URL.revokeObjectURL(url);
+            showToast('💾 Full backup exported!', 'success');
+        }
+
+        function importData(file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    if (!data.accounts || !Array.isArray(data.accounts)) {
+                        showToast('❌ Invalid backup file.', 'error');
+                        return;
+                    }
+                    // Decrypt imported accounts if they were exported unencrypted
+                    const imported = data.accounts.map(a => {
+                        if (!a._encrypted) {
+                            // Re-encrypt with current master password
+                            a.password = xorEncrypt(a.password || '', masterPassword);
+                            a.twoFactor = xorEncrypt(a.twoFactor || '', masterPassword);
+                            a._encrypted = true;
+                        }
+                        return a;
+                    });
+                    // Merge or replace? We'll replace all accounts.
+                    if (confirm('This will replace all current accounts. Continue?')) {
+                        accounts = imported;
+                        activityLog = data.activityLog || [];
+                        if (data.settings) {
+                            settings = { ...settings, ...data.settings };
+                            saveSettings();
+                        }
+                        saveData();
+                        renderDashboard();
+                        showToast('✅ Backup restored successfully!', 'success');
+                    }
+                } catch (err) {
+                    showToast('❌ Error reading backup file.', 'error');
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        // ---------- VIEW FULL ACTIVITY ----------
+        function showFullActivity() {
+            let html = '';
+            if (activityLog.length === 0) {
+                html = '<div style="color:var(--text-secondary);padding:20px;">No activity recorded.</div>';
+            } else {
+                activityLog.slice().reverse().forEach(log => {
+                    html += `
+                        <div class="log-item">
+                            <span>${escapeHtml(log.message)}</span>
+                            <span class="time">${formatDate(log.time)}</span>
+                        </div>
+                    `;
+                });
+            }
+            fullActivityLogContainer.innerHTML = html;
+            activityLogModal.classList.add('active');
+        }
+
+        // ---------- SETTINGS ----------
+        function openSettings() {
+            settingsNewPassword.value = '';
+            settingsConfirmPassword.value = '';
+            settingsTimeout.value = settings.timeout || 15;
+            settingsDefaultPlatform.value = settings.defaultPlatform || 'tiktok';
+            settingsModal.classList.add('active');
+        }
+
+        function saveNewPassword() {
+            const newPw = settingsNewPassword.value;
+            const confirmPw = settingsConfirmPassword.value;
+            if (!newPw) {
+                showToast('Please enter a new password.', 'error');
+                return;
+            }
+            if (newPw !== confirmPw) {
+                showToast('Passwords do not match.', 'error');
+                return;
+            }
+            setMasterPassword(newPw);
+            showToast('✅ Master password updated.', 'success');
+            settingsNewPassword.value = '';
+            settingsConfirmPassword.value = '';
+            // If vault is unlocked, re-encrypt all accounts with new password
+            if (isUnlocked) {
+                accounts = accounts.map(a => {
+                    if (a._encrypted) {
+                        // Decrypt with old password (already in memory) then re-encrypt with new
+                        const pass = xorDecrypt(a.password, masterPassword);
+                        const twoFactor = xorDecrypt(a.twoFactor, masterPassword);
+                        a.password = xorEncrypt(pass, newPw);
+                        a.twoFactor = xorEncrypt(twoFactor, newPw);
+                    }
+                    return a;
+                });
+                saveData();
+                showToast('🔐 Accounts re-encrypted with new master password.', 'success');
+            }
+        }
+
+        function saveTimeout() {
+            const val = parseInt(settingsTimeout.value);
+            if (val < 1) {
+                showToast('Please enter a valid number.', 'error');
+                return;
+            }
+            settings.timeout = val;
+            saveSettings();
+            showToast('⏱️ Auto‑lock timeout updated to ' + val + ' minutes.', 'success');
+            if (isUnlocked) {
+                resetAutoLockTimer();
+            }
+        }
+
+        function saveDefaultPlatform() {
+            settings.defaultPlatform = settingsDefaultPlatform.value;
+            saveSettings();
+            showToast('✅ Default platform updated.', 'success');
+        }
+
+        // ---------- INIT ----------
+        function init() {
+            loadSettings();
+            // Check if master password is set, else set default
+            if (!settings.masterHash) {
+                setMasterPassword(DEFAULT_MASTER_PASSWORD);
+            }
+            loadData();
+            // If vault is not unlocked, show lock overlay
+            if (!isUnlocked) {
+                lockVault();
+            } else {
+                // Decrypt accounts
+                accounts = accounts.map(a => {
+                    if (a._encrypted) {
+                        a.password = xorDecrypt(a.password, masterPassword);
+                        a.twoFactor = xorDecrypt(a.twoFactor, masterPassword);
+                        a._encrypted = false;
+                    }
+                    return a;
+                });
+                saveData();
+                renderDashboard();
+                startAutoLockTimer();
+            }
+
+            // Event listeners
+            unlockBtn.addEventListener('click', function() {
+                const pw = masterPasswordInput.value;
+                unlockVault(pw);
+            });
+            masterPasswordInput.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') {
+                    const pw = this.value;
+                    unlockVault(pw);
+                }
+            });
+
+            lockToggleBtn.addEventListener('click', function() {
+                if (isUnlocked) {
+                    lockVault();
+                } else {
+                    // if locked, focus password input
+                    masterPasswordInput.focus();
+                }
+            });
+
+            // Add account
+            addAccountBtn.addEventListener('click', openAddModal);
+
+            // Account form submission
+            accountForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const platform = formPlatform.value;
+                const username = formUsername.value.trim();
+                const password = formPassword.value.trim();
+                const twoFactor = formTwoFactor.value.trim();
+                const phone = formPhone.value.trim();
+                const phoneBackup = formPhoneBackup.value.trim();
+                const country = formCountry.value.trim();
+                const niche = formNiche.value.trim();
+                const followers = parseInt(formFollowers.value) || 0;
+                const image = currentImageData || '';
+                const tags = currentTags;
+                const notes = formNotes.value.trim();
+                const priority = parseInt(formPriority.value) || 0;
+                const profileLink = formProfileLink.value.trim();
+                const status = formStatus.value;
+                const editId = formEditId.value;
+
+                if (!username) {
+                    showToast('Please enter username/email.', 'error');
+                    return;
+                }
+
+                // Check duplicate username
+                const existing = accounts.find(a => a.username === username && a.id !== editId);
+                if (existing) {
+                    showToast('⚠️ An account with this username/email already exists.', 'error');
+                    return;
+                }
+
+                const data = {
+                    platform, username, password, twoFactor, phone, phoneBackup,
+                    country, niche, followers, image, tags, notes, priority, profileLink, status
+                };
+
+                if (editId) {
+                    updateAccount(editId, data);
+                    showToast('✅ Account updated!', 'success');
+                } else {
+                    createAccount(data);
+                    showToast('✅ Account added!', 'success');
+                }
+                closeAccountModal();
+                renderDashboard();
+                // Unselect all
+                selectedIds.clear();
+                renderBulkBar();
+            });
+
+            formCancelBtn.addEventListener('click', closeAccountModal);
+            accountModal.addEventListener('click', function(e) {
+                if (e.target === this) closeAccountModal();
+            });
+
+            // Tags
+            addTagBtn.addEventListener('click', addTagFromInput);
+            formTagInput.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    addTagFromInput();
+                }
+            });
+
+            // Image upload
+            imageUploadArea.addEventListener('click', function() {
+                imageFileInput.click();
+            });
+            imageFileInput.addEventListener('change', function() {
+                if (this.files && this.files[0]) {
+                    handleImageUpload(this.files[0]);
+                }
+            });
+            applyImageUrlBtn.addEventListener('click', function() {
+                applyImageUrl(formImageUrl.value);
+            });
+            removeImageBtn.addEventListener('click', removeImage);
+
+            // Password generator
+            generatePasswordBtn.addEventListener('click', generatePassword);
+
+            // Details modal
+            detailsCloseBtn.addEventListener('click', function() {
+                detailsModal.classList.remove('active');
+            });
+            detailsModal.addEventListener('click', function(e) {
+                if (e.target === this) detailsModal.classList.remove('active');
+            });
+
+            // Settings
+            openSettingsBtn.addEventListener('click', openSettings);
+            settingsCloseBtn.addEventListener('click', function() {
+                settingsModal.classList.remove('active');
+            });
+            settingsModal.addEventListener('click', function(e) {
+                if (e.target === this) settingsModal.classList.remove('active');
+            });
+            settingsSavePassword.addEventListener('click', saveNewPassword);
+            settingsSaveTimeout.addEventListener('click', saveTimeout);
+            settingsSaveDefaultPlatform.addEventListener('click', saveDefaultPlatform);
+
+            // Backup
+            openBackupBtn.addEventListener('click', function() {
+                backupModal.classList.add('active');
+            });
+            backupCloseBtn.addEventListener('click', function() {
+                backupModal.classList.remove('active');
+            });
+            backupModal.addEventListener('click', function(e) {
+                if (e.target === this) backupModal.classList.remove('active');
+            });
+            exportDataBtn.addEventListener('click', exportAllData);
+            importFileInput.addEventListener('change', function() {
+                if (this.files && this.files[0]) {
+                    importData(this.files[0]);
+                    this.value = '';
+                }
+            });
+
+            // Bulk actions
+            selectAllBtn.addEventListener('click', selectAll);
+            bulkDeleteBtn.addEventListener('click', bulkDelete);
+            bulkExportBtn.addEventListener('click', bulkExport);
+            bulkAddTagBtn.addEventListener('click', bulkAddTag);
+            bulkStatusBtn.addEventListener('click', bulkChangeStatus);
+
+            // Bulk tag modal
+            bulkTagCancelBtn.addEventListener('click', function() {
+                bulkTagModal.classList.remove('active');
+                bulkTagInput.value = '';
+            });
+            bulkTagApplyBtn.addEventListener('click', bulkApplyTag);
+            bulkTagModal.addEventListener('click', function(e) {
+                if (e.target === this) bulkTagModal.classList.remove('active');
+            });
+
+            // Bulk status modal
+            bulkStatusCancelBtn.addEventListener('click', function() {
+                bulkStatusModal.classList.remove('active');
+            });
+            bulkStatusApplyBtn.addEventListener('click', bulkApplyStatus);
+            bulkStatusModal.addEventListener('click', function(e) {
+                if (e.target === this) bulkStatusModal.classList.remove('active');
+            });
+
+            // Activity log modal
+            viewAllActivityBtn.addEventListener('click', showFullActivity);
+            activityLogCloseBtn.addEventListener('click', function() {
+                activityLogModal.classList.remove('active');
+            });
+            activityLogModal.addEventListener('click', function(e) {
+                if (e.target === this) activityLogModal.classList.remove('active');
+            });
+
+            // Keyboard shortcuts
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    if (accountModal.classList.contains('active')) closeAccountModal();
+                    if (detailsModal.classList.contains('active')) detailsModal.classList.remove('active');
+                    if (settingsModal.classList.contains('active')) settingsModal.classList.remove('active');
+                    if (backupModal.classList.contains('active')) backupModal.classList.remove('active');
+                    if (bulkTagModal.classList.contains('active')) bulkTagModal.classList.remove('active');
+                    if (bulkStatusModal.classList.contains('active')) bulkStatusModal.classList.remove('active');
+                    if (activityLogModal.classList.contains('active')) activityLogModal.classList.remove('active');
+                }
+                // Ctrl+F for search focus
+                if ((e.ctrlKey || e.metaKey) && e.key === 'f') {
+                    e.preventDefault();
+                    searchInput.focus();
+                }
+            });
+
+            // Search with debounce
+            let searchTimeout;
+            searchInput.addEventListener('input', function() {
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(function() {
+                    renderAccountList();
+                }, 300);
+            });
+
+            // Filters
+            platformFilter.addEventListener('change', renderAccountList);
+            statusFilter.addEventListener('change', renderAccountList);
+            tagFilter.addEventListener('change', renderAccountList);
+            sortFilter.addEventListener('change', renderAccountList);
+
+            // Reset auto-lock on user interaction
+            document.addEventListener('click', resetAutoLockTimer);
+            document.addEventListener('keydown', resetAutoLockTimer);
+
+            console.log('🔐 Social Vault initialized.');
+            console.log('📦 Accounts:', accounts.length);
+            console.log('📋 Activity entries:', activityLog.length);
+        }
+
+        // Run init when DOM ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', init);
+        } else {
+            init();
+        }
+
+    })();
+</script>
+
+</body>
+</html>
